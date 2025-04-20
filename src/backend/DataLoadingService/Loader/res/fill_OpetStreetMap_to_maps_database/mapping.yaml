@@ -1,0 +1,526 @@
+tags:
+  load_all: true
+  exclude:
+  - created_by
+  - source
+
+generalized_tables:
+  industrial_zones_gen1:
+    source: industrial_zones
+    sql_filter: ST_Area(geometry)>5000.0
+    tolerance: 60.0
+
+  natural_gen0:
+    source: natural_gen1
+    sql_filter: ST_Area(geometry)>1000000.0
+    tolerance: 600.0
+  natural_gen1:
+    source: natural_gen2
+    sql_filter: ST_Area(geometry)>200000.0
+    tolerance: 180.0
+  natural_gen2:
+    source: natural_gen3
+    sql_filter: ST_Area(geometry)>80000.0
+    tolerance: 100.0
+  natural_gen3:
+    source: natural_poly
+    sql_filter: ST_Area(geometry)>1000.0
+    tolerance: 40.0
+
+  islands_gen0:
+    source: islands_gen1
+    sql_filter: ST_Area(geometry)>20000.0
+    tolerance: 200.0
+  islands_gen1:
+    source: islands_gen2
+    sql_filter: ST_Area(geometry)>10000.0
+    tolerance: 80.0
+  islands_gen2:
+    source: islands_poly
+    sql_filter: ST_Area(geometry)>1000.0
+    tolerance: 40.0
+
+  landuse_grass_gen0:
+    source: landuse_grass_gen1
+    sql_filter: ST_Area(geometry)>100000.0
+    tolerance: 200.0
+  landuse_grass_gen1:
+    source: landuse_grass_gen2
+    sql_filter: ST_Area(geometry)>10000.0
+    tolerance: 80.0
+  landuse_grass_gen2:
+    source: landuse_grass_poly
+    sql_filter: ST_Area(geometry)>1000.0
+    tolerance: 40.0
+
+  cemeteries_gen0:
+    source: cemeteries_gen1
+    sql_filter: ST_Area(geometry)>10000.0
+    tolerance: 100.0
+  cemeteries_gen1:
+    source: cemeteries_poly
+    sql_filter: ST_Area(geometry)>1000.0
+    tolerance: 40.0
+
+  natural_water_gen0:
+    source: natural_water_gen1
+    sql_filter: ST_Area(geometry)>300000.0
+    tolerance: 300.0
+  natural_water_gen1:
+    source: natural_water_gen2
+    sql_filter: ST_Area(geometry)>30000.0
+    tolerance: 100.0
+  natural_water_gen2:
+    source: natural_water_poly
+    sql_filter: ST_Area(geometry)>10000.0
+    tolerance: 50.0
+
+  waterways_gen0:
+    source: waterways_gen1
+    tolerance: 50.0
+  waterways_gen1:
+    source: waterways_way
+    tolerance: 20.0
+
+  railways_gen0:
+    source: railways_gen1
+    tolerance: 300.0
+    sql_filter:
+      type IN ('rail') and usage IN ('main')
+  railways_gen1:
+    source: railways_gen2
+    tolerance: 80.0
+    sql_filter:
+      type IN ('rail') and usage IN ('main')
+  railways_gen2:
+    source: railways_way
+    tolerance: 40.0
+    sql_filter:
+      type IN ('rail')
+
+  roads_gen0:
+    source: roads_gen1
+    tolerance: 900.0
+    sql_filter:
+      type IN ('motorway', 'trunk')
+  roads_gen1:
+    source: roads_gen2
+    tolerance: 300.0
+    sql_filter:
+      type IN ('motorway', 'trunk', 'primary')
+  roads_gen2:
+    source: roads_gen3
+    tolerance: 100.0
+    sql_filter:
+      type IN ('motorway', 'trunk', 'primary', 'secondary')
+  roads_gen3:
+    source: roads_gen4
+    tolerance: 20.0
+    sql_filter:
+      type IN ('motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'street')
+  roads_gen4:
+    source: roads_way
+    tolerance: 10.0
+    sql_filter:
+      type IN ('motorway', 'motorway_link', 'trunk', 'trunk_link', 'primary', 'primary_link',
+      'secondary', 'secondary_link', 'tertiary', 'tertiary_link', 'street', 'residential', 'unclassified', 'road')
+
+tables:
+  buildings_poly:
+    type: polygon # Multipolygon relations are automatically handled by Imposm for all polygon tables.
+    mapping:
+      building: [__any__]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: type, type: mapping_value}
+
+      - {name: housenumber, key: "addr:housenumber", type: string}
+      - {name: street, key: "addr:street", type: string}
+      - {name: place, key: "addr:place", type: string} # 1-й квартал Капотня
+      - {name: quarter, key: "addr:quarter", type: string} # 1-й квартал Капотня
+      - {name: addr_full, key: "addr:full", type: string} # 1-й квартал Капотня
+      - {name: addr_district, key: "addr:district", type: string}
+      - {name: name, key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+
+      - {name: building_height, key: "building:height", type: integer}
+      - {name: building_levels, key: "building:levels",  type: integer}
+      - {name: building_part, key: "building:part",  type: string}
+      - {name: height, key: height, type: integer}
+      - {name: min_level, key: 'building:min_level', type: integer}
+      - {name: amenity, key: amenity, type: string}
+      - {name: building_series, key: "design:ref", type: string}
+      - {name: building_meterial, key: "building:material", type: string}
+      - {name: building_cladding, key: "building:cladding", type: string}
+      - {name: building_flats, key: "building:flats", type: string}
+      - {name: building_year, key: start_date, type: string}
+    filters:
+      reject:
+        building: ['no', none, 'No']
+        "building:levels": ['0']
+        location: ['underground']
+        layer: ['-1', '-2', '-3', '-4', '-5','-6', '-7','-8']
+        covered: ['yes']
+
+  building_parts_poly:
+    type: polygon
+    mapping:
+      "building:part": ["yes"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: type, key: "building", type: string}
+      - {name: building_height, key: "building:height", type: integer}
+      - {name: building_levels, key: "building:levels",  type: integer}
+      - {name: height, key: height, type: integer}
+      - {name: min_level, key: 'building:min_level', type: integer}
+    filters:
+      reject:
+        #"building:levels": [none, '0']
+        building: ['no', none, 'No']
+        location: ['underground']
+        layer: ['-1', '-2', '-3', '-4', '-5','-6', '-7','-8']
+        covered: ['yes']
+
+  roads_way:
+    type: linestring
+    mapping:
+      highway: [ "motorway", "motorway_link", "trunk", "trunk_link", "primary", "primary_link",
+                 "secondary", "secondary_link", "tertiary", "tertiary_link", "unclassified", "street", "street_limited",
+                 "residential", "living_street", "track", "raceway", "road", "service"]
+      aeroway: ["runway"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: type, type: mapping_value}
+      - {name: name, key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: short_name, key: short_name, type: string}
+      - {name: short_name_ru, key: "short_name:ru", type: string}
+      - {name: short_name_en, key: "short_name:en", type: string}
+      - {name: ref, key: ref, type: string}
+      - {name: ref_ru, key: "ref:ru", type: string}
+      - {name: ref_en, key: "ref:en", type: string}
+      - {name: loc_ref,  key: loc_ref, type: string}
+      - {name: loc_ref_ru, key: "loc_ref:ru", type: string}
+      - {name: loc_ref_en, key: "loc_ref:en", type: string}
+      - {name: lanes, key: lanes, type: integer}
+    filters:
+      reject:
+        location: ['underground']
+        layer: ['-1', '-2', '-3', '-4', '-5','-6', '-7','-8']
+        covered: ['yes']
+        tunnel: ['yes']
+
+  footways_way:
+    type: linestring
+    mapping:
+      highway: ["pedestrian", "steps", "footway", "bridleway", "path", "yes", "track", "sidewalk", "cycleway"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: type, type: mapping_value}
+      - {name: name, key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+    reject:
+      location: [ 'underground' ]
+      tunnel: [__any__]
+      layer: ['-1', '-2', '-3', '-4', '-5','-6', '-7','-8']
+      covered: [ 'yes' ]
+
+  railways_way:
+    type: linestring
+    mapping:
+      railway: ["rail", "light_rail", "monorail", "narrow_gauge", "tram"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: type, type: mapping_value}
+      - {name: name, key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: service, key: service, type: string}
+      - {name: usage, key: usage, type: string}
+      - {name: z_order, key: layer, type: wayzorder}
+      - {name: gauge, key: gauge, type: integer}
+      - {name: electrified, key: electrified, type: string}
+      - {name: ref, key: ref, type: string}
+      - {name: ref_ru, key: "ref:ru", type: string}
+      - {name: ref_en, key: "ref:en", type: string}
+      - {name: loc_ref,  key: loc_ref, type: string}
+      - {name: loc_ref_ru,  key: "loc_ref:ru", type: string}
+      - {name: loc_ref_en,  key: "loc_ref:en", type: string}
+      - {name: maxspeed, key: maxspeed, type: integer}
+      - {name: passenger_lines, key: passenger_lines, type: integer}
+      - {name: location, key: location, type: string}
+      - {name: tunnel, key: tunnel, type: string}
+      - {name: colour, key: colour, type: string}
+    filters:
+      reject:
+        tunnel: [__any__]
+        layer: ['-1', '-2', '-3', '-4', '-5','-6', '-7','-8']
+        service: ["siding"]
+
+  subway_route_members:
+    type: relation_member
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: member, key: member, type: member_id}
+      - {name: index, key: index, type: member_index}
+      - {name: role, key: role, type: member_role}
+      - {name: type, key: type, type: member_type}
+      - {name: geometry, type: geometry}
+      - {name: name, key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: colour, key: colour, type: string}
+
+    relation_types: ["route"]
+    mapping:
+      route: ["subway"]
+
+  natural_poly:
+    type: polygon
+    mapping:
+      natural: ["wood", "forest"]
+      landuse: ["orchard", "forest"]
+      leisure: ["park", "nature_reserve"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: type, type: mapping_value}
+      - {name: name, key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+
+  natural_water_poly:
+    type: polygon
+    mapping:
+      natural: ["water", "bay", "strait"]
+      waterway: ["riverbank"]
+    columns:
+      - { name: id, key: osm_id, type: id }
+      - { name: geometry, type: geometry }
+      - { name: name, key: name, type: string }
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - { name: z_order, key: layer, type: wayzorder }
+      - { name: location, key: location, type: string }
+      - { name: water, key: water, type: string }
+      - { name: waterway, key: waterway, type: string }
+      - { name: boat, key: boat, type: bool }
+      - { name: tunnel, key: tunnel, type: string }
+
+  waterways_way:
+    type: linestring
+    mapping:
+      waterway: [__any__]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: type, type: mapping_value}
+      - {name: name, key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: z_order, key: layer, type: wayzorder}
+      - {name: location, key: location, type: string}
+      - {name: tunnel, key: tunnel, type: string}
+    filters:
+      reject:
+        waterway: ['pressurised']
+        tunnel: [__any__]
+        location: ['underground']
+
+  landuse_grass_poly:
+    type: polygon
+    mapping:
+      natural: ["grassland"]
+      landuse: ["grass", "meadow", "village_green", "recreation_ground"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+
+  cemeteries_poly:
+    type: polygon
+    mapping:
+      landuse: ["cemetery"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: name,  key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+
+  industrial_zones:
+    type: polygon
+    mapping:
+      landuse: ["industrial", "commercial", "retail", "construction", "garages", "military", "railway", "highway"]
+      aerodrome: ["international"]
+      aeroway: ["aerodrome"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: type, type: mapping_value}
+      - {name: name,  key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+
+
+  residential_zones:
+    type: polygon
+    mapping:
+      landuse: ["residential"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: type, type: mapping_value}
+      - {name: name,  key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+
+  place_point:
+    type: point
+    mapping:
+      place: ["city", "town", "village", "hamlet", "isolated_dwelling"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: type, type: mapping_value}
+      - {name: name, key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: population, key: population, type: integer}
+      - {name: capital, key: capital,  type: bool}
+
+  place_poly:
+    type: polygon
+    mapping:
+      place: ["city", "town", "village", "hamlet", "isolated_dwelling"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: type, type: mapping_value}
+      - {name: name, key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: population, key: population, type: integer}
+      - {name: capital, key: capital,  type: bool}
+
+  subway_stations:
+    type: point
+    mapping:
+      station: ["subway"]
+    columns:
+      - { name: id, key: osm_id, type: id }
+      - { name: geometry, type: geometry }
+      - { name: name, key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - { name: colour, key: colour,  type: string}
+      - { name: station, key: station, type: string}
+      - { name: railway, key: railway, type: string}
+
+  subway_station_entrances:
+    type: point
+    mapping:
+      railway: ["subway_entrance"]
+    columns:
+      - { name: id, key: osm_id, type: id }
+      - { name: geometry, type: geometry }
+      - { name: name, key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+
+  admin_level_poly:
+    type: polygon
+    mapping:
+      admin_level: [__any__]
+      boundary: ["administrative"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: name, key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: admin_level, key: admin_level, type: integer}
+      - {name: boundary, key: boundary,  type: string}
+      - {name: ref, key: ref, type: string}
+      - {name: ref_ru, key: "ref:ru", type: string}
+      - {name: ref_en, key: "ref:en", type: string}
+      - {name: website, key: website,  type: string}
+      - {name: wikipedia, key: wikipedia,  type: string}
+      - {name: wikidata, key: wikidata,  type: string}
+
+# ---- FOR INFRASTRUCTURE LAYERS ---------------------------------------------------------------------------------------
+  infrastructure_poly:
+    type: polygon
+    mapping:
+      shop: ["convenience", "supermarket", "mall", "greengrocer"]
+      amenity: ["pharmacy", "school", "kindergarten", "clinic"]
+      healthcare: ["clinic"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: shop, key: shop, type: string}
+      - {name: amenity, key: amenity, type: string}
+      - {name: healthcare, key: healthcare, type: string}
+      - {name: geometry, type: geometry}
+      - {name: name,  key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: brand, key: "brand", type: string}
+      - {name: operator, key: "operator", type: string}
+      - {name: operator_en, key: "operator:en", type: string}
+      - {name: operator_ru, key: "operator:ru", type: string}
+
+  infrastructure_point:
+    type: point
+    mapping:
+      shop: ["convenience", "supermarket", "mall", "greengrocer"]
+      amenity: ["pharmacy", "school", "kindergarten", "clinic"]
+      healthcare: ["clinic"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: shop, key: shop, type: string}
+      - {name: amenity, key: amenity, type: string}
+      - {name: healthcare, key: healthcare, type: string}
+      - {name: geometry, type: geometry}
+      - {name: name,  key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: brand, key: "brand", type: string}
+      - {name: operator, key: "operator", type: string}
+      - {name: operator_en, key: "operator:en", type: string}
+      - {name: operator_ru, key: "operator:ru", type: string}
+
+# ---- FOR FILTERS -----------------------------------------------------------------------------------------------------
+  where_to_eat_poly:
+    type: polygon
+    mapping:
+      fast_food: [cafeteria"]
+      amenity: ["food_court", "restaurant", "cafe"]
+
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: type, type: mapping_value}
+      - {name: geometry, type: geometry}
+      - {name: name,  key: name, type: string}
+      - {name: brand, key: "brand", type: string}
+      - {name: operator, key: "operator", type: string}
+
+  where_to_eat_point:
+    type: point
+    mapping:
+      fast_food: [cafeteria"]
+      amenity: ["food_court", "restaurant", "cafe"]
+
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: type, type: mapping_value}
+      - {name: geometry, type: geometry}
+      - {name: name,  key: name, type: string}
+      - {name: brand, key: "brand", type: string}
+      - {name: operator, key: "operator", type: string}
