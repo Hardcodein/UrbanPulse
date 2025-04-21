@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  # PostgreSQL база данных с PostGIS. Здесь хранятся все данные, связанные с картой.
+  urban_pulse_maps_database:
+    container_name: urban_pulse_maps_database
+    image: maps_to_database:latest
+    build: ../maps_to_database
+    volumes:
+      - maps_to_database_volume:/var/lib/postgresql/data
+    networks:
+      - isolated_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+    ports:
+      - "65432:5432"
+
+
+volumes:
+  maps_to_database_volume:
+
+networks:
+  isolated_network:

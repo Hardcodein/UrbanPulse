@@ -2,10 +2,10 @@
 
 from typing import Dict, List, Optional, Set
 
-from Loader.Loader.Interfaces.IPhaseRepositoryStatus import IPhaseRepositoryStatus
+from Loader.Interfaces.IPhaseRepositoryStatus import IPhaseRepositoryStatus
 
-from Loader.Loader.Models.PhaseStatus import PhaseStatus
-from Loader.Loader.Models.Phase import Phase
+from Loader.Models.PhaseStatus import PhaseStatus
+from Loader.Models.Phase import Phase
 
 class DataProvider:
     def __init__(self,

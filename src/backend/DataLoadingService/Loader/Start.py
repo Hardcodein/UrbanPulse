@@ -4,17 +4,17 @@ import os
 from pathlib import Path
 import time
 from typing import List
-from Loader.Loader.Models.Phase import Phase
-from Loader.Loader.Services.DataProvider import DataProvider
-from Loader.Loader.Services.FIlePhaseStatusStore import FilePhaseStatusStore
-from Loader.Loader.Phases.Implement_geojson_to_maps_to_database import Start as Implement_geojson_to_maps_to_database
-from Loader.Loader.Phases.Implement_osm_to_maps_database import Start as Implement_osm_to_maps_database
-from Loader.Loader.Phases.Preparation_tables import Start as Preparation_tables
-from Loader.Loader.Phases.Change_osm_data_phase import Start as Change_osm_data_phase
-from Loader.Loader.Phases.Human_density_coverage import Start as Human_density_coverage
-from Loader.Loader.Phases.Create_tiles import Start as Create_tiles
-from Loader.Loader.Phases.Change_tables_for_search_index import Start as Change_tables_for_search_index
-from Loader.Loader.Phases.Create_search_index import Start as Create_search_index
+from Loader.Models.Phase  import Phase    
+from Loader.Services.DataProvider import DataProvider
+from Loader.Services.FIlePhaseStatusStore import FilePhaseStatusStore
+from Loader.Phases.Implement_geojson_to_maps_to_database import Start as Implement_geojson_to_maps_to_database
+from Loader.Phases.Implement_osm_to_maps_database import Start as Implement_osm_to_maps_database
+from Loader.Phases.Preparation_tables import Start as Preparation_tables
+from Loader.Phases.Change_osm_data_phase import Start as Change_osm_data_phase
+from Loader.Phases.Human_density_coverage import Start as Human_density_coverage
+from Loader.Phases.Create_tiles import Start as Create_tiles
+from Loader.Phases.Change_tables_for_search_index import Start as Change_tables_for_search_index
+from Loader.Phases.Create_search_index import Start as Create_search_index
 
 
 
@@ -27,12 +27,12 @@ def run_loader():
 
     argumentParser.add_argument('--osm-directory',
                                  required=True, 
-                                 default=Path('res'),
+                                 default=Path('data'),
                                  help='Directory for download files')
 
     argumentParser.add_argument('--cities', 
                                 required=True, 
-                                default="",
+                                default="all",
                                 help="Cities")
 
     argumentParser.add_argument('--from-phase', 
@@ -67,7 +67,7 @@ def run_loader():
     cities = get_list_of_cities(arguments.cities)
 
     # Остановка для инициализации контейнера базы данных
-    time.sleep(2*65)
+   # time.sleep(2*65)
 
     data_prodider = start_data_provider(osm_directory, 
                                               root_tiles_path, 
@@ -101,11 +101,13 @@ def get_all_phases(
         cities_list: List[str]
 ) -> List[Phase]:
     
-    db_url = os.getenv("DATABASE_URL", "postgres://postgres:postgres_pass@localhost:65432/maps_db")
+    db_url = os.getenv("DATABASE_URL", "postgres://postgres:postgres_password@localhost:65432/maps_to_database")
+
     imposm_proto_postgis = os.getenv("IMPOSM_PROTO", "postgis://")
+
     psycopg2_proto = os.getenv("PSYCOPG2_PROTO", "postgresql://")
 
-    navigation_url = os.getenv("NAVIGATION_URL", "http://localhost:8002/sources_to_targets")
+    #navigation_url = os.getenv("NAVIGATION_URL", "http://localhost:8002/sources_to_targets")
 
     # Импорт данных OpenStreetMap  в PostgreSQL
     implement_osm_to_maps_database_phase = Phase(
@@ -135,7 +137,7 @@ def get_all_phases(
     )
 
     change_osm_data_phase = Phase(
-        order_number=3,
+        serial_number=3,
         name='change_osm_data',
         description='Обработка  зданий в PostgreSQL/PostGIS базе данных',
         execution_method=Change_osm_data_phase.start_phase,
@@ -184,7 +186,7 @@ def get_all_phases(
     # )
 
     seed_tiles_phase = Phase(
-        serial_number=8,
+        serial_number=5,
         name='create_tiles',
         description='Создание тайлов',
         execution_method=Create_tiles.start_phase,
@@ -192,7 +194,7 @@ def get_all_phases(
     )
 
     create_tables_for_search_index_phase = Phase(
-        serial_number=9,
+        serial_number=6,
         name='create_tables_for_search_index',
         description='перенос данных из таблицы osm_place_point в таблицу osm_place_poly',
         execution_method=Change_tables_for_search_index.start_phase,
@@ -200,7 +202,7 @@ def get_all_phases(
     )
 
     create_search_index_phase = Phase(
-        serial_number=10,
+        serial_number=7,
         name='create_search_index',
         description='Построение поискового индекса географических объектов ',
         execution_method=Create_search_index.start_phase,

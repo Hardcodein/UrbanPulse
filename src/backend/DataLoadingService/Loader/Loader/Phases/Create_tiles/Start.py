@@ -1,6 +1,6 @@
 from pathlib import Path
 
-import Loader.Loader.Phases.Create_tiles.Create_tiles as Create_tiles
+import Loader.Phases.Create_tiles.Create_tiles as Create_tiles
 
 
 def start_phase(database_url_string: str, 

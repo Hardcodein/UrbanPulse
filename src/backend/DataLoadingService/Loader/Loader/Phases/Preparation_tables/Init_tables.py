@@ -5,7 +5,7 @@ import json
 import time
 import os
 
-import Loader.Loader.Phases.Preparation_tables.UseConst as u
+import Loader.Phases.Preparation_tables.UseConst as u
 
 #Добавление в таблицу колонок  плотность и процент застройки
 def add_density_columns_for_buildings(contection):

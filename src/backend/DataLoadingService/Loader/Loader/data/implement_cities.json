@@ -1,0 +1,112 @@
+{
+    "cities": [
+      {
+        "title_ru": "москва",
+        "title_en": "moscow",
+        "center": {
+          "lat": 55.75086,
+          "lon": 37.61675
+        },
+        "radius_meters": 83000,
+        "osm_extract_file": "central-fed-district-latest.osm.pbf",
+        "geofabrik_path": "russia",
+        "borders_for_tiles": {
+          "west_south": {
+          "lat": 54.990221,
+          "lon": 36.249389
+        },
+          "east_north": {
+          "lat": 56.498891,
+          "lon": 38.984985
+        }
+        }
+      },
+      {
+        "title_ru": "санкт-петербург",
+        "title_en": "saint-petersburg",
+        "center": {
+          "lat": 59.94952,
+          "lon": 30.30865
+        },
+        "radius_meters": 65000,
+        "osm_extract_file": "northwestern-fed-district-latest.osm.pbf",
+        "geofabrik_path": "russia",
+        "borders_for_tiles": {
+          "west_south": {
+          "lat": 59.02817,
+          "lon": 29.00560
+        },
+          "east_north": {
+          "lat": 60.81669,
+          "lon": 31.57234
+        }
+        }
+      },
+      {
+        "title_ru": "краснодар",
+        "title_en": "krasnodar",
+        "center": {
+            "lat": 45.05922,
+            "lon": 38.98732
+        },
+        "radius_meters": 25000,
+        "osm_extract_file": "south-fed-district-latest.osm.pbf",
+        "geofabrik_path": "russia",
+        "borders_for_tiles": {
+            "west_south": {
+                "lat":44.91133,
+                "lon":38.67010
+            },
+            "east_north": {
+                "lat":45.21404,
+                "lon":39.26330
+            }
+        }
+      },
+      {
+           "title_ru":"сочи",
+           "title_en":"sochi",
+           "center":{
+              "lat":43.58547,
+              "lon":39.72309
+           },
+           "radius_meters":70000,
+           "osm_extract_file":"south-fed-district-latest.osm.pbf",
+           "geofabrik_path":"russia",
+           "borders_for_tiles":{
+              "west_south":{
+                 "lat":43.02140,
+                 "lon":38.97183
+              },
+              "east_north":{
+                 "lat":44.23268,
+                 "lon":40.77258
+              }
+           }
+      },
+      {
+        "title_ru": "ростов-на-дону",
+        "title_en": "rostov-on-don",
+        "center": {
+          "lat": 47.22241,
+          "lon": 39.71871
+        },
+        "radius_meters": 40000,
+        "osm_extract_file": "south-fed-district-latest.osm.pbf",
+        "geofabrik_path": "russia",
+        "borders_for_tiles": {
+          "west_south": {
+            "lat": 46.95123,
+            "lon": 39.40189
+          },
+          "east_north": {
+            "lat": 47.34185,
+            "lon": 40.01253
+          }
+        }
+      }
+          
+    ]
+  }
+  
+  

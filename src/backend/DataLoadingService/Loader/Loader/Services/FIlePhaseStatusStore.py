@@ -1,10 +1,12 @@
 from pathlib import Path
 
-from Loader.Interfaces import IPhaseRepositoryStatus
-from Loader.Loader.Models import PhaseStatus
+from Loader.Interfaces.IPhaseRepositoryStatus import IPhaseRepositoryStatus
+from Loader.Models.PhaseStatus   import PhaseStatus
 
 class FilePhaseStatusStore(IPhaseRepositoryStatus):
+
     def __init__(self,dataFolderPath : Path):
+
         if dataFolderPath.is_file():
             raise AssertionError(f"{dataFolderPath} не директория. Это файл")
         
@@ -31,7 +33,7 @@ class FilePhaseStatusStore(IPhaseRepositoryStatus):
 
          #Запись в файл статуса
         with open(str(filepath), 'w') as file:
-            file.write([phase_status].value)
+            file.write(phase_status.value)
 
 
     def get_status_by_phase_name(self, 

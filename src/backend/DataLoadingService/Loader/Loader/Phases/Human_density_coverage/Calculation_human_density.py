@@ -3,9 +3,9 @@ import json
 import time
 
 
-from Loader.Loader.Phases.Human_density_coverage.Calculation_roads_and_water_area import get_area_roads, get_area_rails, get_area_water
-from Loader.Loader.Phases.Human_density_coverage.Helpers_human_density import get_rail_width,coordinants_from_text
-import Loader.Loader.Phases.Human_density_coverage.Consts_human_density as Const_human_density
+from Loader.Phases.Human_density_coverage.Calculation_roads_and_water_area import get_area_roads, get_area_rails, get_area_water
+from Loader.Phases.Human_density_coverage.Helpers_human_density import get_rail_width,coordinants_from_text
+import Loader.Phases.Human_density_coverage.Consts_human_density as Const_human_density
 
 
 def calculation_humans_in_buildings(

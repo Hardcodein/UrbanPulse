@@ -9,7 +9,7 @@ from pathlib import Path
 
 import psycopg2
 
-from Loader.Loader.Phases.Create_tiles.configuraton import *
+from Loader.Phases.Create_tiles.configuraton import *
 
 cities_borders = {}
 
