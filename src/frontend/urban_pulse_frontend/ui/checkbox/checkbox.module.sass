@@ -1,0 +1,22 @@
+.checkbox
+  position: relative
+  display: inline-flex
+
+  &__input
+    flex-shrink: 0
+
+    &_hidden
+      display: none
+
+  &__control
+    flex-shrink: 0
+
+  &__content
+    flex-shrink: 1
+    padding-left: 7px
+
+  &_checked
+    pointer-events: all
+
+  &_disabled
+    pointer-events: none

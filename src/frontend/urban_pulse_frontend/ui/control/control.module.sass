@@ -1,0 +1,25 @@
+.control
+  position: relative
+  background: #FFFFFF
+  box-shadow: 0 2px 4px rgba(0, 16, 61, 0.16)
+  border-radius: 4px
+  width: 42px
+  height: 42px
+  display: flex
+  align-items: center
+  justify-content: center
+
+
+  &_is
+    &_location
+      margin-top: 16px
+
+  svg,
+  svg line
+    transition: all .2s
+
+  &:hover line
+    stroke: gray !important
+
+  &:hover svg
+    fill: gray !important

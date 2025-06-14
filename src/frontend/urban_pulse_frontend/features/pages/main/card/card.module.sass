@@ -1,0 +1,26 @@
+@import "../../../../ui/tokens"
+
+.card
+  background: white
+  border-radius: 4px
+  padding: 16px
+
+  &_shadow
+    box-shadow: $depth2
+
+  &__header
+    display: flex
+    align-items: center
+
+    + .card__content
+      padding-top: 10px
+
+  &__title
+    font-family: $font-family
+    font-size: 14px
+    font-weight: 500
+    line-height: 18px
+    color: black
+
+  &__content
+    font-size: 14px

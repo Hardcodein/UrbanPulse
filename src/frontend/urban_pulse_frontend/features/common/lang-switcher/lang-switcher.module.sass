@@ -1,0 +1,18 @@
+.lang-switcher
+  display: flex
+  justify-content: center
+  align-items: center
+
+  $block: #{&}
+
+  #{$block} &__link
+    font-size: 14px
+    text-transform: uppercase
+    padding: 0 5px
+    transition: opacity .2s
+
+    &:hover
+      opacity: 0.7
+
+    & + #{$block}__link
+      border-left: 1px solid gray

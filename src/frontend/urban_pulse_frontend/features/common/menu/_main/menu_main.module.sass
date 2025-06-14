@@ -1,0 +1,15 @@
+.menu
+  $block: #{&}
+  $blockModMain: #{&}_main
+
+  &#{$blockModMain}
+    display: flex
+
+  &#{$blockModMain} &__item
+    font-size: 14px
+    padding: 5px
+    transition: opacity .2s
+
+    &:hover
+      opacity: 0.7
+

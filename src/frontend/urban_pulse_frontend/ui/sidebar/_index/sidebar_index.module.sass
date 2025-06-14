@@ -1,0 +1,12 @@
+.sidebar
+  $blockModIndex: #{&}_index
+  $blockModExpand: #{&}_expand
+
+  &#{$blockModIndex}#{$blockModExpand} &__footer
+    position: absolute
+    width: 100%
+    bottom: 0
+    left: 0
+
+  #{$blockModIndex} &__item
+    margin-top: 10px

@@ -1,0 +1,27 @@
+.map_main
+  position: absolute
+
+  &.map_feedback-bug canvas,
+  &.map_ruler canvas
+    cursor: pointer
+
+  // override the basic map styles
+  &.mmrgl-map
+    font: inherit
+
+  .mmrgl-ctrl
+    &-attrib
+      margin: 0
+
+    &-logos
+      margin: 0 85px 16px 0
+
+    &-logo-sep,
+    &-logo-osm
+      display: none
+
+    &-logo-main
+      background-image: url('./images/beta_logo.svg')
+      width: 132px
+      height: 20px
+      pointer-events: none
