@@ -131,7 +131,3 @@ def change_buildings(database_url: str):
     toc = time.perf_counter()
     print(f"Закончено изменение зданий{toc - tic:0.1f} s")
 
-
-if __name__ == "__main__":
-    database_url = "postgresql://postgres:postgres_pass@homehub_maps_db/maps_db"
-    change_buildings(database_url)

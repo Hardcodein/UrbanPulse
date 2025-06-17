@@ -5,7 +5,9 @@ __pycache__/
 
 # C extensions
 *.so
-
+/node_modules
+/.pnp
+.pnp.js
 # Distribution / packaging
 .Python
 build/
@@ -102,7 +104,7 @@ venv.bak/
 
 # Rope project settings
 .ropeproject
-
+.pbf
 # mkdocs documentation
 /site
 
@@ -119,3 +121,13 @@ dmypy.json
 
 #Pycharm IDE
 .idea
+
+.DS_Store
+seed_tiles/tiles/*
+*.pyc
+.idea/*
+run_loader/data/*
+run_loader/custom_files/*
+!run_loader/data/supported_cities.json
+!run_loader/data/dem_intermediate/*.ramp
+

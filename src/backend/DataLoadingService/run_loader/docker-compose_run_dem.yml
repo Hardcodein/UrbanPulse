@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  # scripts for converting DEM to raster relief tiles.
+  homehub_seed_dem_raster_tiles:
+    container_name: urban_pulse_preparation_dem
+    image: seed_dem_raster_tiles:latest
+    build:
+      context: ../seed_dem_raster_tiles
+
+    # Use mount point:
+    volumes:
+      - ./data:/data
+
+volumes:
+  maps_db_volume:

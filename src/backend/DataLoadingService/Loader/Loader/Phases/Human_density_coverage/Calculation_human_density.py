@@ -1,12 +1,56 @@
 import psycopg2
 import json
 import time
+#from Loader.Phases.Human_density_coverage.Calculation_roads_and_water_area import get_area_roads, get_area_rails, get_area_water
+#from Loader.Phases.Human_density_coverage.Calculation_roads_and_water_area import get_area_roads, get_area_rails, get_area_water
+#import Loader.Phases.Human_density_coverage.Consts_human_density as Const_human_density
+
+from Calculation_roads_and_water_area import get_area_roads, get_area_rails, get_area_water
+from Helpers_human_density import get_rail_width,coordinants_from_text
+import Consts_human_density as Const_human_density
 
 
-from Loader.Phases.Human_density_coverage.Calculation_roads_and_water_area import get_area_roads, get_area_rails, get_area_water
-from Loader.Phases.Human_density_coverage.Helpers_human_density import get_rail_width,coordinants_from_text
-import Loader.Phases.Human_density_coverage.Consts_human_density as Const_human_density
+def get_area_buildings(conn, cursorQ, area_land_text):
+    table = "osm_buildings_poly"
 
+    cursorQ.execute(f"SELECT id,"
+                    f"   ST_Area(ST_Intersection(geometry, 'SRID=3857;{area_land_text}')),"
+                    "    building_levels,"
+                    "    min_level"
+                    f" FROM {table}"
+                    f" WHERE"
+                    f"   ST_Intersects(geometry, 'SRID=3857;{area_land_text}')")
+
+    area_bld = 0.0
+    area_bld_levels = 0.0
+
+    bld_count_no_levels = 0
+    bld_count_levels = 0.0
+    levels_sum = 0
+
+    for recI in cursorQ.fetchall():
+        gid, inter_area, levels, min_level = recI
+
+        multiplier = 0.0
+        if levels is not None:
+            multiplier = levels
+
+            if min_level is not None and 0 < min_level < levels:
+                multiplier -= min_level
+
+            levels_sum += multiplier
+            bld_count_levels += 1
+        else:
+            bld_count_no_levels += 1
+
+        area_bld_levels += inter_area * multiplier
+
+        if bld_count_no_levels > 0 and bld_count_levels > 0:
+            area_bld_levels += (levels_sum / bld_count_levels) * bld_count_no_levels
+
+        area_bld += inter_area
+
+    return area_bld, area_bld_levels
 
 def calculation_humans_in_buildings(
     connection, 
@@ -30,8 +74,8 @@ def calculation_humans_in_buildings(
     - buildings_with_data: количество зданий с данными по этажам
     - buildings_without_data: количество зданий без данных по этажам
     """
-    residents_coef_apartment=2.5, 
-
+    residents_coef_apartment = 2.5
+    residents_coef_levels = 10 
     table = "osm_buildings_poly"
     
     cursor.execute(
@@ -40,7 +84,7 @@ def calculation_humans_in_buildings(
             id,
             ST_Area(ST_Intersection(geometry, 'SRID=3857;{area_land_text}')) as area,
             building_levels,
-            building_flats,
+            building_flats
         FROM {table}
         WHERE ST_Intersects(geometry, 'SRID=3857;{area_land_text}')
         """
@@ -52,30 +96,31 @@ def calculation_humans_in_buildings(
 
     buildings_without_data = 0
     
-    buildings_with_levels = []
-    
     for rec in cursor.fetchall():
 
         gid, area, levels,flats = rec
         
         if area <= 0:
             continue  
+                      
+        buildings_with_data += 1
+        
+        
+
+        if flats is not None and flats > 1:
             
-        if levels is not None:
-            
-            # Оценка количества квартир в здании:
-            # (площадь здания / площадь одной квартиры) * число этажей
-            residents = int(flats) * residents_coef_apartment
-            
+            flats = int(flats)
+            residents = flats * residents_coef_apartment
             total_residents += residents
             buildings_with_data += 1
-            buildings_with_levels.append(residents)
+        elif levels is not None and levels > 1 :
+            total_residents  = levels * residents_coef_levels
         else:
             buildings_without_data += 1
     
     # Если есть здания без данных по этажам, используем среднее значение от зданий с данными
     if buildings_without_data > 0 and buildings_with_data > 0:
-        avg_residents_per_building = sum(buildings_with_levels) / buildings_with_data
+        avg_residents_per_building  = residents_coef_apartment
         total_residents += avg_residents_per_building * buildings_without_data
     
     return {
@@ -172,7 +217,7 @@ def calculation_and_update_human_density(connection):
         ) as q
     """)
 
-    print("Fetching buildings geometry: retrieved the cursor")
+    print("Выбрана геометрия здания")
 
     for idx, rec in enumerate(cursor):
         gid, levels_count, is_drawable, buffer_text, buffer_plaintext, buffer_area, coef = rec
@@ -203,11 +248,11 @@ def calculation_and_update_human_density(connection):
             continue
 
         # Рассчитываем плотность населения (чел/км²)
-        human_density = (total_residents_in_area / area_inhabitable) * 100 if area_inhabitable > 0 else 0
+        human_density = (total_residents_in_area / area_inhabitable) *1000 if area_inhabitable > 0 else 0
         
         # Логирование прогресса
-        if idx % 1000 == 0:
-            print(f"Processed {idx} buildings, current density: {human_density:.2f} people/km²")
+        if idx % 5000 == 0:
+            print(f"Processed {idx} buildings, current density: {human_density:.4f} people/m²")
 
         # Обновляем запись здания
         update_building_human_density_record(cursorA, gid, human_density)
@@ -217,20 +262,27 @@ def calculation_and_update_human_density(connection):
             update_building_parts_human_denstity_records(connection, gid, human_density)
 
     connection.commit()
-    print("Human density calculation completed")
+    print("Расчет плотности населения закончен")
 
     
-def calculation_human_denstity(database_url_string: str):
+def calculation_human_density(database_url_string: str):
 
-    connection = psycopg2.connect(database_url_string)
-
+    
     print("Подключение к БД")
+    connection = psycopg2.connect(database_url_string)
+    print("Подключение успешно")
+   
+    print("Начало рассчета плотности населения")
 
     tic = time.perf_counter()
 
-    calculation_and_update_human_density(connection)
+    #calculation_and_update_human_density(connection)    
+
+    print("Расчитана плотность населения для зданий")
 
     generalize_hex_human_density_tables(connection)
+
+    print("Сгенерированы данные для hex")
 
     if connection:
         connection.close()
@@ -241,4 +293,4 @@ def calculation_human_denstity(database_url_string: str):
 
 
 if __name__ == "__main__":
-    calculation_human_denstity()
+    calculation_and_update_human_density()

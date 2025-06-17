@@ -1,13 +1,15 @@
 version: '3.8'
 
 services:
-  # PostgreSQL база данных с PostGIS. Здесь хранятся все данные, связанные с картой.
   urban_pulse_maps_database:
     container_name: urban_pulse_maps_database
     image: maps_to_database:latest
     build: ../maps_to_database
     volumes:
       - maps_to_database_volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_password
     networks:
       - isolated_network
     healthcheck:
@@ -17,6 +19,64 @@ services:
       retries: 15
     ports:
       - "65432:5432"
+
+  urban_pulse_loader:
+    container_name: urban_pulse_loader
+    image: urban_pulse/loader:latest
+    build:
+      context: ../Loader
+    environment:
+      OSM_DIR: /data
+      
+      CITIES: "all"
+      IMPOSM_PROTO: postgis://
+      PSYCOPG2_PROTO: postgresql://
+      DATABASE_URL: postgres:postgres_password@urban_pulse_maps_database:5432/maps_to_database
+      NAVIGATION_URL: http://urban_pulse_navigation:8002
+    volumes:
+      - ./data:/data
+    networks:
+      - isolated_network
+    depends_on:
+      - urban_pulse_maps_database
+ 
+  valhalla:
+    image: ghcr.io/nilsnolde/docker-valhalla/valhalla:latest
+    container_name: urban_pulse_navigation
+    ports:
+      - 8002:8002
+    #build:
+    #  context: .
+    #  args:
+    #    - VALHALLA_UID=1000
+    #    - VALHALLA_GID=1000
+    volumes:
+      - ./custom_files/:/custom_files
+      # - ./gtfs_feeds:/gtfs_feeds  # only enable with build_transit=True
+    networks:
+       - isolated_network
+    environment:
+      # Auto-download PBFs from Geofabrik
+      # - tile_urls=https://download.geofabrik.de/europe/andorra-latest.osm.pbf https://download.geofabrik.de/europe/albania-latest.osm.pbf
+      - server_threads=2  # determines how many threads will be used to run the valhalla server
+      - serve_tiles=True  # If True, starts the service. If false, stops after building the graph.
+      - use_tiles_ignore_pbf=True  # load existing valhalla_tiles.tar directly
+      - tileset_name=valhalla_tiles  # name of the resulting graph on disk
+      - build_elevation=False  # build elevation with "True" or "Force": will download only the elevation for areas covered by the graph tiles
+      - build_admins=False  # build admins db with "True" or "Force"
+      - build_time_zones=False  # build timezone db with "True" or "Force"
+      - build_transit=False  # build transit, needs existing GTFS directories mapped to /gtfs_feeds
+      - build_tar=True  # build an indexed tar file from the tile_dir for faster graph loading times
+      - force_rebuild=False  # forces a rebuild of the routing tiles with "True"
+      - update_existing_config=True  # if there are new config entries in the default config, add them to the existing config  
+      # - path_extension=graphs  # this path will be internally appended to /custom_files; no leading or trailing path separator!
+    # adapt to the expected build time
+    # healthcheck: 
+    #   test: curl --fail -s http://localhost:8002/status || exit 1
+    #   interval: 1s
+    #   retries: 10
+    #   start_period: 2s
+    #   timeout: 1s
 
 
 volumes:

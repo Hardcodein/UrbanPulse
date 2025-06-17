@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "circle-to-polygon": "^2.2.0",
+    "turf": "^3.0.14"
+  }
+}

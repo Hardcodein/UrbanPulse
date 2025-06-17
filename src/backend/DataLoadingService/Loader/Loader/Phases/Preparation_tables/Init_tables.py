@@ -109,6 +109,21 @@ def create_infrastructure_tables(conn):
         cursor.execute(command)
         conn.commit()
 
+def create_human_density_tables(conn):
+    cursor = conn.cursor()
+
+    table = "human_density_poi"
+    commands = [f"DROP TABLE IF EXISTS {table}",
+            f"CREATE TABLE {table} (gid serial, poi numeric, title text, "
+            f"title_en text, title_ru text)",
+            f"ALTER TABLE {table} ADD PRIMARY KEY (gid)",
+            f"SELECT AddGeometryColumn('', '{table}', 'geometry', 3857, 'GEOMETRY', 2)",
+            f"CREATE INDEX {table}_geom_idx ON {table} USING GIST(geometry)",
+            ]
+
+    for command in commands:
+        cursor.execute(command)
+        conn.commit()
 
 def add_is_drawable_building_columns(conn):
     cursor = conn.cursor()
@@ -161,6 +176,7 @@ def wait_for_file(filename):
 
 
 def create_tables(database_url: str):
+    
     conn = psycopg2.connect(database_url)
     print("Connected to db")
     tic = time.perf_counter()
@@ -169,10 +185,11 @@ def create_tables(database_url: str):
     add_density_columns_for_buildings(conn)
     create_hex_tables(conn)
     add_infrastructure_columns(conn)
+    create_human_density_tables(conn)
     create_infrastructure_tables(conn)
     add_is_drawable_building_columns(conn)
     add_subway_columns(conn)
-
+    
 
     if conn:
         conn.close()
@@ -184,7 +201,7 @@ def create_tables(database_url: str):
 
 if __name__ == "__main__":
     wait_for_file("/data/finished_osm_import.txt")
-    database_url = "postgresql://postgres:postgres_pass@homehub_maps_db/maps_db"
+    database_url = "postgres://postgres:postgres_password@localhost:65432/maps_to_database"
     create_tables(database_url)
 
     with open('/data/finished_tables_preparation.txt', 'w') as f:

@@ -127,7 +127,7 @@ generalized_tables:
 
 tables:
   buildings_poly:
-    type: polygon # Multipolygon relations are automatically handled by Imposm for all polygon tables.
+    type: polygo
     mapping:
       building: [__any__]
     columns:
@@ -137,9 +137,9 @@ tables:
 
       - {name: housenumber, key: "addr:housenumber", type: string}
       - {name: street, key: "addr:street", type: string}
-      - {name: place, key: "addr:place", type: string} # 1-й квартал Капотня
-      - {name: quarter, key: "addr:quarter", type: string} # 1-й квартал Капотня
-      - {name: addr_full, key: "addr:full", type: string} # 1-й квартал Капотня
+      - {name: place, key: "addr:place", type: string}
+      - {name: quarter, key: "addr:quarter", type: string}
+      - {name: addr_full, key: "addr:full", type: string} 
       - {name: addr_district, key: "addr:district", type: string}
       - {name: name, key: name, type: string}
       - {name: name_ru, key: "name:ru", type: string}
@@ -154,7 +154,7 @@ tables:
       - {name: building_series, key: "design:ref", type: string}
       - {name: building_meterial, key: "building:material", type: string}
       - {name: building_cladding, key: "building:cladding", type: string}
-      - {name: building_flats, key: "building:flats", type: string}
+      - {name: building_flats, key: "building:flats", type: integer}
       - {name: building_year, key: start_date, type: string}
     filters:
       reject:
@@ -454,6 +454,218 @@ tables:
       - {name: website, key: website,  type: string}
       - {name: wikipedia, key: wikipedia,  type: string}
       - {name: wikidata, key: wikidata,  type: string}
+
+# ---- FOR ECOLOGY LAYERS ----------------------------------------------------------------------------------------------
+
+# ---- POWERPLANTS
+  powerplants_poly:
+    type: polygon
+    mapping:
+        power: ["plant"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: name,  key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: operator, key: operator, type: string}
+      - {name: operator_en, key: "operator:en", type: string}
+      - {name: operator_ru, key: "operator:ru", type: string}
+      - {name: start_date, key: start_date, type: string}
+      - {name: plant_source, key: "plant:source", type: string}
+      - {name: wikipedia, key: wikipedia,  type: string}
+      - {name: wikidata, key: wikidata,  type: string}
+      - {name: contact_website, key: "contact:website", type: string}
+      - {name: website, key: "website", type: string}
+
+  powerplants_line:
+    type: linestring
+    mapping:
+      power: ["plant"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: name,  key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: operator, key: operator, type: string}
+      - {name: operator_en, key: "operator:en", type: string}
+      - {name: operator_ru, key: "operator:ru", type: string}
+      - {name: start_date, key: start_date, type: string}
+      - {name: plant_source, key: "plant:source", type: string}
+      - {name: wikipedia, key: wikipedia,  type: string}
+      - {name: wikidata, key: wikidata,  type: string}
+      - {name: contact_website, key: "contact:website", type: string}
+      - {name: website, key: "website", type: string}
+
+# ---- FACTORIES
+  factories_poly:
+    type: polygon
+    mapping:
+      landuse: ["industrial"]
+      industrial: ["factory"]
+      man_made: ["works", "wastewater_plant"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: name,  key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: power,  key: power, type: string}
+      - {name: operator, key: operator, type: string}
+      - {name: operator_en, key: "operator:en", type: string}
+      - {name: operator_ru, key: "operator:ru", type: string}
+      - {name: owner, key: owner, type: string}
+      - {name: man_made, key: man_made,  type: string}
+      - {name: industrial, key: industrial,  type: string}
+      - {name: factory, key: factory,  type: string}
+      - {name: product, key: product,  type: string}
+      - {name: contact_website, key: "contact:website", type: string}
+      - {name: website, key: "website", type: string}
+
+  factories_line:
+    type: linestring
+    mapping:
+      landuse: ["industrial"]
+      industrial: ["factory"]
+      man_made: ["works"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: name,  key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: power,  key: power, type: string}
+      - {name: operator, key: operator, type: string}
+      - {name: operator_en, key: "operator:en", type: string}
+      - {name: operator_ru, key: "operator:ru", type: string}
+      - {name: owner, key: owner, type: string}
+      - {name: man_made, key: man_made,  type: string}
+      - {name: industrial, key: industrial,  type: string}
+      - {name: factory, key: factory,  type: string}
+      - {name: product, key: product,  type: string}
+      - {name: contact_website, key: "contact:website", type: string}
+      - {name: website, key: "website", type: string}
+
+# ---- AIRPORTS
+  airports_poly:
+    type: polygon
+    mapping:
+      aeroway: ["aerodrome"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: name,  key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: aerodrome_type, key: "aerodrome:type", type: string}
+      - {name: aerodrome, key: "aerodrome", type: string}
+      - {name: operator, key: operator, type: string}
+      - {name: operator_en, key: "operator:en", type: string}
+      - {name: operator_ru, key: "operator:ru", type: string}
+      - {name: owner, key: owner, type: string}
+      - {name: wikipedia, key: wikipedia,  type: string}
+      - {name: wikidata, key: wikidata,  type: string}
+      - {name: contact_website, key: "contact:website", type: string}
+      - {name: website, key: "website", type: string}
+
+  airports_line:
+    type: linestring
+    mapping:
+      aeroway: ["aerodrome"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: name,  key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: aerodrome_type, key: "aerodrome:type", type: string}
+      - {name: aerodrome, key: "aerodrome", type: string}
+      - {name: operator, key: operator, type: string}
+      - {name: operator_en, key: "operator:en", type: string}
+      - {name: operator_ru, key: "operator:ru", type: string}
+      - {name: owner, key: owner, type: string}
+      - {name: wikipedia, key: wikipedia,  type: string}
+      - {name: wikidata, key: wikidata,  type: string}
+      - {name: contact_website, key: "contact:website", type: string}
+      - {name: website, key: "website", type: string}
+
+  airports_point:
+    type: point
+    mapping:
+      aeroway: ["aerodrome"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: name,  key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: aerodrome_type, key: "aerodrome:type", type: string}
+
+      - {name: aerodrome, key: "aerodrome", type: string}
+      - {name: operator, key: operator, type: string}
+      - {name: operator_en, key: "operator:en", type: string}
+      - {name: operator_ru, key: "operator:ru", type: string}
+      - {name: owner, key: owner, type: string}
+      - {name: wikipedia, key: wikipedia,  type: string}
+      - {name: wikidata, key: wikidata,  type: string}
+      - {name: contact_website, key: "contact:website", type: string}
+      - {name: website, key: "website", type: string}
+
+# ---- RAILWAY_STATIONS
+  railway_stations_poly:
+    type: polygon
+    mapping:
+      building: ["train_station"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: name,  key: name, type: string}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: operator, key: operator, type: string}
+      - {name: operator_en, key: "operator:en", type: string}
+      - {name: operator_ru, key: "operator:ru", type: string}
+      - {name: owner, key: owner, type: string}
+      - {name: wikipedia, key: wikipedia,  type: string}
+      - {name: wikidata, key: wikidata,  type: string}
+      - {name: contact_website, key: "contact:website", type: string}
+      - {name: website, key: "website", type: string}
+    filters:
+      reject:
+        station: [ 'subway' ]
+
+  railway_stations_line:
+    type: linestring
+    mapping:
+      building: ["train_station"]
+    columns:
+      - {name: id, key: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {name: name_ru, key: "name:ru", type: string}
+      - {name: name_en, key: "name:en", type: string}
+      - {name: name,  key: name, type: string}
+      - {name: operator, key: operator, type: string}
+      - {name: operator_en, key: "operator:en", type: string}
+      - {name: operator_ru, key: "operator:ru", type: string}
+      - {name: owner, key: owner, type: string}
+      - {name: wikipedia, key: wikipedia,  type: string}
+      - {name: wikidata, key: wikidata,  type: string}
+      - {name: contact_website, key: "contact:website", type: string}
+      - {name: website, key: "website", type: string}
+    filters:
+      reject:
+        station: [ 'subway' ]
+
+  islands_poly:
+    type: polygon
+    mapping:
+      place: ["island", "islet"]
+      natural: ["coastline"]
+    columns:
+      - { name: id, key: osm_id, type: id }
+      - { name: geometry, type: geometry }
+
 
 # ---- FOR INFRASTRUCTURE LAYERS ---------------------------------------------------------------------------------------
   infrastructure_poly:

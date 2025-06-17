@@ -1,9 +1,9 @@
+import io
 import json
 import logging
 import os
 import shutil
 import zipfile
-
 import geopandas
 import psycopg2
 import requests
@@ -11,21 +11,19 @@ from shapely.geometry import Polygon
 
 logger = logging.getLogger('import_geojson_to_maps_db')
 logger.setLevel(logging.INFO)
-# create file handler which logs even debug messages
 ch = logging.StreamHandler()
 ch.setLevel(logging.INFO)
-# create formatter and add it to the handlers
+
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
-# add the handlers to the logger
 logger.addHandler(ch)
 
 GEOJSON_DATA_LIST = [
     {
-        "raw_file": "ne_10m_geography_marine_polys/ne_10m_geography_marine_polys.shp",
+        "raw_file": "ne_10m_geography_marine_polys/ne_10m_ocean.shp",
         "borders_file": "oceans_clipped.geojson",
         "table": "world_oceans",
-        "source_url": "https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/physical/ne_10m_ocean.zip",
+        "source_url": "https://naciscdn.org/naturalearth/10m/physical/ne_10m_ocean.zip",
         "need_to_create_subfolder": True
     },
 
@@ -33,14 +31,14 @@ GEOJSON_DATA_LIST = [
         "raw_file": "ne_10m_populated_places/ne_10m_populated_places.shp",
         "borders_file": "places_clipped.geojson",
         "table": "world_cities",
-        "source_url": "https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_populated_places.zip",
+        "source_url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_populated_places.zip",
         "need_to_create_subfolder": True
     },
     {
         "raw_file": "ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp",
         "borders_file": "countries_clipped.geojson",
         "table": "world_countries",
-        "source_url": "https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_admin_0_countries.zip?version=4.1.0",
+        "source_url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_countries.zip",
         "need_to_create_subfolder": True
     },
     {
@@ -49,8 +47,8 @@ GEOJSON_DATA_LIST = [
         "table": "world_oceans_detailed",
         "source_url": "https://osmdata.openstreetmap.de/download/water-polygons-split-4326.zip",
         "need_to_create_subfolder": False
-    }]
-
+    }
+]
 SCALE = 0
 EMPTY_VALUE = ""
 
@@ -103,7 +101,7 @@ def prepare_files(data, data_path: str):
         logger.info(f"{filepath} существует")
         return
 
-    path = filepath.split("/")
+    path, filename  = filepath.split("/")
     
     zip_path = download_file(data["source_url"], data_path)
 
@@ -127,21 +125,28 @@ def init_main_tables(database_url: str, data_path: str):
 
         logger.info(f"Выборка {data_item['table']}")
 
-        prepare_files(data_item, data_path)
+        path = os.path.join(data_path, data_item["borders_file"])
 
-        shape_file = geopandas.read_file(os.path.join(data_path, data_item["raw_file"]))
+        if not (os.path.isfile(path)):
 
-        logger.info("Парсинг файла")
 
-        if data_item["table"] == "world_oceans_detailed":
-            polygon = Polygon(
+            prepare_files(data_item, data_path)
+
+            print(f" Путь посл prepare {data_path}")
+            print(f"GeoPandas: {geopandas.__version__}")
+            shape_file = geopandas.read_file(os.path.join(data_path, data_item["raw_file"]))
+            print(f"Парсинг окончен")
+            logger.info("Парсинг окончен")
+
+            if data_item["table"] == "world_oceans_detailed":
+                polygon = Polygon(
                 [(-180.0, 0), 
                  (-180.0, 89.0), 
                  (180.0, 89.0), 
                  (180.0, 0)]
-            )
-        else:
-            polygon = Polygon(
+                )
+            else:
+                polygon = Polygon(
                 [
                     (-180.0, -89.0),
                     (-180.0, 89.0),
@@ -150,18 +155,21 @@ def init_main_tables(database_url: str, data_path: str):
                 ]
             )
 
-        world_clipped = geopandas.clip(shape_file, polygon)
+            world_clipped = geopandas.clip(shape_file, polygon)
 
-        logger.info("Обрезка")
+            logger.info("Обрезка")
 
-        filepath = os.path.join(data_path, data_item["borders_file"])
+            filepath = os.path.join(data_path, data_item["borders_file"])
 
-        world_clipped.to_file(filepath, driver="GeoJSON")
+            world_clipped.to_file(filepath, driver="GeoJSON")
 
-        logger.info("Файл сохранен")
+            logger.info("Файл сохранен")
+        else:
+            filepath = os.path.join(data_path, data_item["borders_file"])
+            print(data_item["borders_file"]+" существует")
 
-        with open(filepath) as file:
-
+        with io.open(filepath,encoding='utf-8') as file:
+            logger.info("Файл открыт")
             data = json.load(file)
 
             for object in data["features"]:
@@ -209,8 +217,9 @@ def init_main_tables(database_url: str, data_path: str):
                     f"VALUES ({scalerank}, '{stype}', '{name}', '{name_ru}', '{name_en}', "
                     f"ST_TRANSFORM(ST_MakeValid(ST_GeomFromGeoJSON('{geo_json}')), 3857))"
                 )
+            logger.info("Окончена загрузка в "+ data_item["table"])
 
-        logger.info("Выборка")
+        logger.info("Окончена загрузка в БД")
 
     connection.commit()
 

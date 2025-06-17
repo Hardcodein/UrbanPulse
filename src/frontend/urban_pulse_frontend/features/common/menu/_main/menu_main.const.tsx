@@ -6,9 +6,5 @@ export const menu = [
   {
     href: '/about',
     name: 'about_page',
-  },
-  {
-    href: '/calculations',
-    name: 'calculations_page',
-  },
+  }
 ]

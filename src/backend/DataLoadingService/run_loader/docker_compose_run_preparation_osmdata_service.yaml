@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  urban_pulse_preparation_osmdata:
+    container_name: urban_pulse_preparation_osmdata
+    image: preparation_osmdata:latest
+    build:
+      context: ../preparation_osmdata
+    environment:
+      osm_dir: /data
+      cities: "all"
+    volumes:
+      - ./data:/data
+
+volumes:
+  maps_db_volume:

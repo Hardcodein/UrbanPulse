@@ -23,7 +23,7 @@ def main(database_url_string: str,
          resources_directory: str, 
          osm_directory: str, 
          cities_list: List[str]):
-
+    dir = os.listdir()
     with open(os.path.join(osm_directory, 'implement_cities.json'), "r", encoding="utf-8") as json_file:
         implement_cities_list = json.load(json_file)
 
@@ -41,7 +41,7 @@ def main(database_url_string: str,
 
         mapping_path = os.path.join(resources_directory, 'mapping.yaml')
 
-        cmd = f"/go/imposm-0.11.0-linux-x86-64/imposm import " \
+        cmd = f"/go/imposm-0.14.1-linux-x86-64/imposm import " \
               f" -connection {database_url_string}" \
               f" -read {path_file}" \
               f" -mapping {mapping_path}" \

@@ -8,8 +8,8 @@ import json
 from pathlib import Path
 
 import psycopg2
-
-from Loader.Phases.Create_tiles.configuraton import *
+from configuraton import *
+#from Loader.Phases.Create_tiles.configuraton import *
 
 cities_borders = {}
 
@@ -133,9 +133,10 @@ def generate_tile(connection,
 
     bin_data = cursor.fetchone()[0]
 
-    if len(bin_data) > 0:
-        with open(cur_y_tile, 'wb') as f:
-            f.write(bin_data)
+    
+    with open(cur_y_tile, 'wb') as f:
+        f.write(bin_data)
+    
 
     return True
 
@@ -169,6 +170,9 @@ def seed_tiles_for_source(source_data,
         tic = time.perf_counter()
 
         for x in range(x_start, x_finish + 1):
+
+            if(x == 76):
+                continue
 
             cur_x_path = os.path.join(tiles_path, f"{zoom_item}/{x}/")
 

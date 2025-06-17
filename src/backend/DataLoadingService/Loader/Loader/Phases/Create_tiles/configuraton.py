@@ -1,28 +1,18 @@
-# -*- coding: utf-8 -*-
 
 THREADS_COUNT = 2
-
-# Directory for saving tiles:
-
 default_source = "osm"
 
 sources = [
     {
         "name": "global",
-        # Bounding for tiles consisting of 2 points. Southwest and Northeast
-        # World boundaries.
-        # if you set abs(lat) to more then 85 degrees, you will have negative y.
         "bbox_p1_deg": [-85.0, -180.0],  # lat, lon
         "bbox_p2_deg": [85.0, 180.0],
-
         "def_min_zoom": 0,
         "def_max_zoom": 7,
-        # 0, 1, 2, 3, 4, 5
         "zoom_levels": [0, 1, 2, 3, 4, 5, 6, 7]
     },
     {
         "name": "analytics",
-
         "def_min_zoom": 6,
         "def_max_zoom": 15,
 
@@ -38,8 +28,7 @@ sources = [
     }
 ]
 
-implement_cities = "'Москва','Санкт-Петербург','Ростов-на-Дону', " \
-                   "'Краснодар', 'Сочи',"
+implement_cities = "'Ростов-на-Дону'"
 
 small_towns = "'Scientific station', 'Historic place', 'Meteorogical Station', 'Populated place'"
 
@@ -50,7 +39,7 @@ switch_for_building_type = "CASE WHEN type in ('industrial', 'garages', 'warehou
 
 # Layers of vector tiles:
 layers = [
-    {
+     {
         "layer_name": "ecology_poi",
         "table": "ecology_poi",
         "fields": "poi_type, title as name, "
@@ -123,9 +112,7 @@ layers = [
     {
         "layer_name": "hex",
         "table": "hex_tiles_xl",
-        "fields": "impact, bld_pct::numeric::integer as s, bld_dens_pct::numeric::integer as v, "
-                  "infrastructure::numeric::integer as infrastructure, life_quality,"
-                  "filter_subway, filter_park, filter_where_to_eat, filter_school, filter_kindergarten, filter_shop",
+        "fields": "bld_pct::numeric::integer as s",
         "min_zoom": 6,
         "max_zoom": 8,
         "source": "analytics"
@@ -133,7 +120,7 @@ layers = [
     {
         "layer_name": "hex",
         "table": "hex_tiles_l",
-        "fields": "impact, bld_pct::numeric::integer as s, bld_dens_pct::numeric::integer as v, "
+        "fields": "impact, bld_pct::numeric::integer as s, bld_dens_pct::numeric::integer as v, bld_human_density::numeric::integer as h, "
                   "infrastructure::numeric::integer as infrastructure, life_quality,"
                   "filter_subway, filter_park, filter_where_to_eat, filter_school, filter_kindergarten, filter_shop",
         "min_zoom": 9,
@@ -143,7 +130,7 @@ layers = [
     {
         "layer_name": "hex",
         "table": "hex_tiles_m",
-        "fields": "impact, bld_pct::numeric::integer as s, bld_dens_pct::numeric::integer as v, "
+        "fields": "impact, bld_pct::numeric::integer as s, bld_dens_pct::numeric::integer as v, bld_human_density::numeric::integer as h, "
                   "infrastructure::numeric::integer as infrastructure, life_quality,"
                   "filter_subway, filter_park, filter_where_to_eat, filter_school, filter_kindergarten, filter_shop",
         "min_zoom": 10,
@@ -153,7 +140,7 @@ layers = [
     {
         "layer_name": "hex",
         "table": "hex_tiles_s",
-        "fields": "impact, bld_pct::numeric::integer as s, bld_dens_pct::numeric::integer as v, "
+        "fields": "impact, bld_pct::numeric::integer as s, bld_dens_pct::numeric::integer as v, bld_human_density::numeric::integer as h, "
                   "infrastructure::numeric::integer as infrastructure, life_quality,"
                   "filter_subway, filter_park, filter_where_to_eat, filter_school, filter_kindergarten, filter_shop",
         "min_zoom": 11,
@@ -163,7 +150,7 @@ layers = [
     {
         "layer_name": "hex",
         "table": "hex_tiles",
-        "fields": "impact, bld_pct::numeric::integer as s, bld_dens_pct::numeric::integer as v, "
+        "fields": "impact, bld_pct::numeric::integer as s, bld_dens_pct::numeric::integer as v, bld_human_density::numeric::integer as h, "
                   "infrastructure::numeric::integer as infrastructure, life_quality,"
                   "filter_subway, filter_park, filter_where_to_eat, filter_school, filter_kindergarten, filter_shop",
         "min_zoom": 12,

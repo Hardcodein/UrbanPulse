@@ -1,4 +1,5 @@
-from Loader.Phases.Human_density_coverage.Helpers_human_density import get_line_width_and_default_lanes
+#from Loader.Phases.Human_density_coverage.Helpers_human_density import get_line_width_and_default_lanes
+from Helpers_human_density import get_line_width_and_default_lanes
 
 
 def get_area_roads(conn, cursorQ, area_land_text, coef):

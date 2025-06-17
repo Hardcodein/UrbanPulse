@@ -8,7 +8,7 @@ export function Logo(): JSX.Element {
   return (
     <div className={b()}>
       <Image
-        alt="HomeHub"
+        alt="UrbanPulse"
         src={require(`./images/logo.svg`)}
         width={50}
         height={50}

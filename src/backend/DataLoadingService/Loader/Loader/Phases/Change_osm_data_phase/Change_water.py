@@ -95,5 +95,5 @@ def change_water(database_url: str):
 
 
 if __name__ == "__main__":
-    database_url = "postgresql://postgres:postgres_pass@homehub_maps_db/maps_db"
+    database_url = ""
     change_water(database_url)

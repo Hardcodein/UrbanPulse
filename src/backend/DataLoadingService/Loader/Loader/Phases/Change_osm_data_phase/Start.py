@@ -9,4 +9,4 @@ def start_phase(database_url: str,
               osm_directory: Path):
     change_water(database_url)
     preparation_subways(database_url, osm_directory)
-    bld_parts.fix_buildings(database_url)
+    bld_parts.change_buildings(database_url)

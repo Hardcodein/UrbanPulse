@@ -1,0 +1,11 @@
+shapely==2.0.3
+pyproj==3.2.0
+psycopg2-binary==2.9.1
+numpy==1.21.2
+tqdm==4.62.2
+geojson==2.5.0
+rtree==0.9.7
+python-dateutil==2.8.2
+pandas>=1.5.0
+fiona==1.8.22
+geopandas>=0.12.0

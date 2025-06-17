@@ -155,8 +155,7 @@
             "type": "fill",
             "source": "analytics",
             "source-layer": "hex",
-            "minzoom": 10,
-            "maxzoom": 17,
+            "minzoom": 15,
             "layout": {
                 
             },
@@ -179,7 +178,7 @@
             "type": "fill",
             "source": "analytics",
             "source-layer": "hex",
-            "minzoom": 6,
+            "minzoom": 10,
             "maxzoom": 15,
             "filter":[">", ["to-number", ["get", "v"]], 1],
             "layout": {
@@ -210,10 +209,10 @@
             "type": "fill",
             "source": "analytics",
             "source-layer": "hex",
-            "minzoom": 12,
-            "maxzoom": 18,  
+            "minzoom": 10,
+            "maxzoom": 15,  
             "filter":[">", ["to-number", ["get", "s"]], 0],
-            "layout": {"visibility":"none"},
+            "layout": {},
             "paint": {
                 "fill-color": [ "interpolate",["linear"], ["to-number", ["get", "s"], 0],
                     10,  "#749e71",
@@ -793,13 +792,13 @@
             }
         },
         {
-            "id": "city_homehub_icon",
+            "id": "city_urbanPulse_icon",
             "type": "symbol",
             "source": "global",
             "source-layer": "target_cities",
             "maxzoom": 6,
             "layout": {
-                "icon-image": "homehub_circle",
+                "icon-image": "urbanPulse_circle",
                 "icon-size": [ "interpolate", ["linear"], ["zoom"],
                     0, 0.3,
                     6, 1
@@ -823,7 +822,7 @@
             "type": "symbol",
             "source": "analytics",
             "source-layer": "infrastructure_poi",
-            "minzoom": 6,
+            "minzoom": 15,
             "layout": {
                 "icon-image": ["get", "poi_type"],
                 "icon-size": [

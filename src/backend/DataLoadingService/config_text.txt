@@ -1,0 +1,25 @@
+
+docker run -v "C:\Users\tormo\source\repos\UrbanPulse\src\backend\DataLoadingService\run_loader\data" -e cities="Москва,Санкт-Петербург" preparation_osmdata
+Tormosin@stas1
+"center": [ 39.63264, 47.21752], Долгота и широта
+
+Хреновый запрос // 
+SELECT  (SELECT ST_AsMVT(q_world_water_poly, 'world_water_poly', 4096, 'geom')        
+FROM (          SELECT  ST_AsMvtGeom(geometry, BBox(77, 68, 7), 4096, 64, true) AS geom         
+ FROM world_oceans_detailed          
+ WHERE ST_Intersects(geometry, BBox(77, 68, 7))          ) as q_world_water_poly)  ||  
+ (SELECT ST_AsMVT(q_world_countries_names, 'world_countries_names', 4096, 'geom')        
+ FROM (          SELECT CASE WHEN name_en <> '' THEN name_en ELSE NULL END as name_en, CASE WHEN name_ru <> '' 
+ THEN name_ru ELSE NULL END as name_ru, ST_AsMvtGeom(ST_Centroid(geometry), BBox(77, 68, 7), 4096, 64, true) AS geom       
+FROM world_countries          WHERE ST_Intersects(ST_Centroid(geometry), BBox(77, 68, 7)) and scalerank < 7         ) 
+as q_world_countries_names)
+
+Офигенный запрос 
+SELECT  (SELECT ST_AsMVT(q_world_water_poly, 'world_water_poly', 4096, 'geom')        
+FROM (          SELECT  ST_AsMvtGeom(geometry, BBox(78, 60, 7), 4096, 64, true) AS geom          
+FROM world_oceans_detailed          
+WHERE ST_Intersects(geometry, BBox(78, 60, 7))          ) as q_world_water_poly)  ||  
+(SELECT ST_AsMVT(q_world_countries_names, 'world_countries_names', 4096, 'geom')        
+FROM (          SELECT CASE WHEN name_en <> '' THEN name_en ELSE NULL END as name_en, CASE WHEN name_ru <> ''
+THEN name_ru ELSE NULL END as name_ru, ST_AsMvtGeom(ST_Centroid(geometry), BBox(78, 60, 7), 4096, 64, true) AS geom          
+FROM world_countries          WHERE ST_Intersects(ST_Centroid(geometry), BBox(78, 60, 7)) and scalerank < 7         ) as q_world_countries_names)

@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  urban_pulse_preparation_metadata:
+    container_name: urban_pulse_preparation_metadata
+    image: preparation_metadata:latest
+    build:
+      context: ../preparation_metadata
+    environment:
+      osm_dir: /data
+    volumes:
+      - ./data:/data
+
+volumes:
+  maps_db_volume:

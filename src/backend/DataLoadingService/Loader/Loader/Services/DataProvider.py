@@ -34,8 +34,10 @@ class DataProvider:
         phases = sorted(phases, key=lambda phase: phase.serial_number)[:]
 
         rigth_serial_numbers = range(len(phases))[:]
-
+        
         for phase, right_order_number in zip(phases, rigth_serial_numbers):
+            print(right_order_number)
+            print(phase.serial_number)
             if phase.serial_number != right_order_number:
                 raise AssertionError()
         
