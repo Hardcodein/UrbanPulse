@@ -3,19 +3,19 @@ import { Mods, Styles } from '@redux/map/map.const'
 import * as Types from './map.types'
 
 const pos = {
-   rostov: {
-    lng: 39.7139,  
-    lat: 47.2357,  
-    zoom: 12,      
-  }
+  spb: {
+    lng: 30.3141,
+    lat: 59.9386,
+    zoom: 11,
+  },
 }
 
 const mapSlice = createSlice({
   name: 'map',
   initialState: {
-    lng: pos.rostov.lng,
-    lat: pos.rostov.lat,
-    zoom: pos.rostov.zoom,
+    lng: pos.spb.lng,
+    lat: pos.spb.lat,
+    zoom: pos.spb.zoom,
     style: Styles.MAIN,
     mod: Mods.DEFAULT,
     dragging: false,

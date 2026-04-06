@@ -93,7 +93,7 @@ export function MapKeeper({
       lat={lat}
       zoom={zoom}
       style={style}
-      accessToken='pk.eyJ1Ijoicnlhbm1pbnRlcjA4IiwiYSI6ImNtOXN5endrbTA2MDMyaXBvdm1hNW96bmMifQ.qumSdswJwxqVGwqULikudw'
+      accessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ''}
       preserveDrawingBuffer={preserveDrawingBuffer}
       onClick={handleClick}
       onLoad={handleOnLoad}

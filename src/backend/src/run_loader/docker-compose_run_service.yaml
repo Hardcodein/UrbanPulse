@@ -38,7 +38,8 @@ services:
     networks:
       - isolated_network
     depends_on:
-      - urban_pulse_maps_database
+      urban_pulse_maps_database:
+        condition: service_healthy
  
   valhalla:
     image: ghcr.io/nilsnolde/docker-valhalla/valhalla:latest

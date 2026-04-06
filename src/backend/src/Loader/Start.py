@@ -6,6 +6,21 @@ import time
 from typing import Dict, List
 
 import psycopg2
+
+
+def wait_for_db(db_url: str, retries: int = 30, delay: int = 2) -> None:
+    """Ждёт готовности БД вместо слепого sleep."""
+    print('Ожидание готовности БД...')
+    for attempt in range(1, retries + 1):
+        try:
+            conn = psycopg2.connect(db_url)
+            conn.close()
+            print('БД готова.')
+            return
+        except psycopg2.OperationalError:
+            print(f'  Попытка {attempt}/{retries} — БД ещё не готова, жду {delay}с...')
+            time.sleep(delay)
+    raise RuntimeError('БД не стала доступна за отведённое время.')
 from Loader.Models.Phase  import Phase    
 from Loader.Services.DataProvider import DataProvider
 from Loader.Services.FIlePhaseStatusStore import FilePhaseStatusStore
@@ -66,14 +81,13 @@ def run_loader():
 
     cities = get_list_of_cities(arguments.cities)
 
-    # Остановка для инициализации контейнера базы данных
-    print('Ожидание БД 30 секунд')
-    time.sleep(30)
-    print('Конец БД')
+    db_url = os.getenv("DATABASE_URL", "postgres://postgres:postgres_password@host:5432/maps_to_database")
+    psycopg2_proto = os.getenv("PSYCOPG2_PROTO", "postgresql://")
+    wait_for_db(psycopg2_proto + db_url)
 
-    data_prodider = start_data_provider(osm_directory, 
-                                              root_tiles_path, 
-                                              cities)
+    data_prodider = start_data_provider(osm_directory,
+                                        root_tiles_path,
+                                        cities)
 
     if hasattr(arguments, 'continue'):
         data_prodider.execute_from_last_excellent_phase()

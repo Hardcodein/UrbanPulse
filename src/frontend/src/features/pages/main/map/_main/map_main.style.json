@@ -1,8 +1,8 @@
 {
     "version": 8,
     "name": "UrbanPulse",
-    "center": [37.5414, 55.7597],
-    "zoom": 9.7,
+    "center": [30.3141, 59.9386],
+    "zoom": 11,
     "sources": {
         "relief": {
             "type": "raster",
@@ -22,7 +22,7 @@
             "tiles": ["http://localhost/tiles/global/{z}/{x}/{y}.pbf"],
             "minzoom": 0,
             "maxzoom": 7,
-            "bounds": [39.6, 47.18, 39.8, 47.28]
+            "bounds": [29.4, 59.6, 31.2, 60.3]
         },
         "analytics": {
             "type": "vector",
