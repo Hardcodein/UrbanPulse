@@ -64,6 +64,29 @@ services:
       timeout: 5s
       retries: 5
 
+  api_service:
+    container_name: urban_pulse_api_service
+    build:
+      context: ../services/ApiService
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      ConnectionStrings__Db: ${TILE_DB_CONNECTION}
+      Nominatim__BaseUrl: ${NOMINATIM_URL}
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      ASPNETCORE_URLS: ${ASPNETCORE_URLS}
+    networks:
+      - isolated_network
+    depends_on:
+      urban_pulse_maps_database:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
   nginx:
     container_name: urban_pulse_nginx
     image: nginx:alpine
