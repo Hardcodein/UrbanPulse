@@ -44,10 +44,6 @@ export function MapMain({ className }: Props): JSX.Element {
     setShowContextMenu(false)
   }, [dragging])
 
-  const handleClick = (e: mapboxgl.MapMouseEvent) => {
-    console.log(e.lngLat)
-  }
-
   const handleRightClick = (e: mapboxgl.MapMouseEvent) => {
     const lng = Number(e.lngLat.lng.toFixed(6))
     const lat = Number(e.lngLat.lat.toFixed(6))
@@ -66,7 +62,6 @@ export function MapMain({ className }: Props): JSX.Element {
     <MapKeeper
       style={mapStyle as mapboxgl.Style}
       className={classes}
-      onClick={handleClick}
       onRightClick={handleRightClick}
     >
       <MapContextMenu

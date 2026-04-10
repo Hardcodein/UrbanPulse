@@ -1,99 +1,93 @@
-import block from 'bem-css-modules';
-import { Formik } from 'formik';
-import { AvailabilityRow } from '@features/pages/main/availability';
-import { Rating } from '@features/pages/main/rating';
-import { Checkbox } from '@ui/checkbox';
-import style from './form_filter.module.sass';
-import { useContext, useRef } from 'react';
-import { MapContext } from '@ui/map/map.context';
+import block from 'bem-css-modules'
+import { useContext } from 'react'
+import { Checkbox } from '@ui/checkbox'
+import { Rating } from '@features/pages/main/rating'
+import { MapContext } from '@ui/map/map.context'
+import style from './form_filter.module.sass'
 
-const b = block(style);
+const b = block(style)
 
+const useMap = () => useContext(MapContext)
 
-export const useMap = () => {
-  return useContext(MapContext);
-};
+type Layer = {
+  id: string
+  label: string
+  type: 'rating' | 'availability'
+  desc?: string
+  name?: string
+  ranges?: Array<string | number>
+}
+
+const LAYERS: Layer[] = [
+  {
+    id: 'analytics_hex_infrastructure',
+    label: 'Доступность социальной инфраструктуры',
+    type: 'rating',
+    desc: 'Доступность социальной инфраструктуры',
+    name: 'infrastructure',
+    ranges: [1, 2, 3, 4, 5],
+  },
+  {
+    id: 'analytics_hex',
+    label: 'Плотность застройки',
+    type: 'rating',
+    desc: 'Плотность застройки',
+    name: 'buildings',
+    ranges: [1, 2, 3, 4, 5],
+  },
+  {
+    id: 'analytics_hex_air',
+    label: 'Экологическая обстановка',
+    type: 'rating',
+    desc: 'Экологическая обстановка',
+    name: 'air',
+    ranges: [1, 2, 3, 4, 5],
+  },
+  {
+    id: 'analytics_hex_life_quality',
+    label: 'Качество жизни',
+    type: 'rating',
+    desc: 'Качество жизни',
+    name: 'life_quality',
+    ranges: [1, 2, 3, 4, 5],
+  },
+]
+
 export function FormFilter(): JSX.Element {
+  const map = useMap()
 
-  const map = useMap(); // Получаем экземпляр карты
-  
-  console.log('Состояние карты:', {
-      isStyleLoaded: map?.isStyleLoaded(),
-      loaded: map?.loaded(),
-      style: map?.getStyle()})
   const handleCheckboxChange = (layerId: string, isChecked: boolean) => {
-    if (map) {
-      console.log(isChecked.toString())
-      const visibility = isChecked ? 'visible' : 'none';
-      map.setLayoutProperty(layerId, 'visibility', visibility);
-      
-    }
-  };
+    if (!map?.isStyleLoaded()) return
+    map.setLayoutProperty(layerId, 'visibility', isChecked ? 'visible' : 'none')
+  }
+
+  const handleReset = () => {
+    LAYERS.forEach(({ id }) => {
+      if (map?.isStyleLoaded()) {
+        map.setLayoutProperty(id, 'visibility', 'none')
+      }
+    })
+  }
 
   return (
     <div className={b({ filter: true })}>
-      <Formik initialValues={{ test: false }} validationSchema={{}} onSubmit={console.log}>
-        {() => (
-          <>
-            <div>
-              <Checkbox 
-                defaultChecked={false}
-                onChange={(isChecked:boolean) => handleCheckboxChange('infrastructure_near', isChecked)}
-              >
-                <Rating
-                  desc={'Доступность социальной инфраструктуры'}
-                  name={'name_1'}
-                  ranges={[1, 2, 3, 4, 5]}
-                />
-              </Checkbox>
-            </div>
-            <div>
-              <Checkbox 
-                defaultChecked={false}
-                
-                onChange={(e) => handleCheckboxChange('population-density-layer', e)}
-              >
-                <Rating
-                  desc={'Плотность населения'}
-                  name={'name_2'}
-                  ranges={[1, 2, 3, 4, 5]}
-                />
-              </Checkbox>
-            </div>
-            <div>
-              <Checkbox 
-                defaultChecked={false}
-                onChange={(e) => handleCheckboxChange('building-density-layer', e)}
-              >
-                <Rating 
-                  desc={'Плотность застройки'} 
-                  name={'name_3'} 
-                  ranges={[1, 2, 3, 4, 5]} />
-              </Checkbox>
-            </div>  
-            <div>
-              <Checkbox 
-                defaultChecked={false}
-                onChange={(e) => handleCheckboxChange('schools-layer',e)}
-              >
-                <AvailabilityRow destination={'школы'} />
-              </Checkbox>
-            </div>
-            <div>
-              <Checkbox 
-                defaultChecked={false}
-                onChange={(e) => handleCheckboxChange('default-layer', e)}
-              >
-                <AvailabilityRow />
-              </Checkbox>
-            </div>
-            <div>
-              <button>Добавить условие</button>
-              <button>Сбросить</button>
-            </div>
-          </>
-        )}
-      </Formik>
+      {LAYERS.map((layer) => (
+        <div key={layer.id}>
+          <Checkbox
+            defaultChecked={false}
+            onChange={(isChecked) => handleCheckboxChange(layer.id, isChecked)}
+          >
+            <Rating
+              desc={layer.desc}
+              name={layer.name ?? layer.id}
+              ranges={layer.ranges ?? [1, 2, 3, 4, 5]}
+            />
+          </Checkbox>
+        </div>
+      ))}
+      <div>
+        <button onClick={handleReset}>Сбросить</button>
+      </div>
     </div>
   )
 }

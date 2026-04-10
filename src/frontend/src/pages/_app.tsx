@@ -45,7 +45,7 @@ export default function RouterEmulatedApp({ ...props }: Props): JSX.Element {
     router.defaultLocale =
       i18nConfig.locales.find((locale) => navigator?.language?.startsWith(locale)) ||
       i18nConfig.defaultLocale
-  })
+  }, [])
 
   return <TranslatedApp {...props} />
 }

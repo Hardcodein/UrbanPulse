@@ -30,10 +30,8 @@ services:
     environment:
       OSM_DIR: ${OSM_DIR}
       CITIES: ${CITIES}
-      IMPOSM_PROTO: ${IMPOSM_PROTO}
       PSYCOPG2_PROTO: ${PSYCOPG2_PROTO}
       DATABASE_URL: ${DATABASE_URL}
-      NAVIGATION_URL: ${NAVIGATION_URL}
     volumes:
       - ./data:/data
     networks:

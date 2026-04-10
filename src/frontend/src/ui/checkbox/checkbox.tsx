@@ -38,24 +38,28 @@ export function Checkbox(props: Props): JSX.Element {
   const handleWholeClick = () => {
     if (disabled || clickZone !== 'whole') return
     onClick && onClick()
-    setChecked((prev) => !prev)
+    const next = !checked
+    setChecked(next)
+    onChange && onChange(next)
   }
 
   const handleContentClick = () => {
     if (disabled || clickZone !== 'content') return
     onClick && onClick()
-    setChecked((prev) => !prev)
+    const next = !checked
+    setChecked(next)
+    onChange && onChange(next)
   }
 
   const handleControlClick = () => {
     if (disabled || clickZone !== 'control') return
-    setChecked((prev) => !prev)
   }
 
   const handleChange = () => {
     if (disabled) return
-    onChange && onChange(checked)
-    if (clickZone === 'whole') return
+    const next = !checked
+    setChecked(next)
+    onChange && onChange(next)
   }
 
   const classes = cn(className, b({ checked, disabled }))

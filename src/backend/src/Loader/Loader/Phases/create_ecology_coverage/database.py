@@ -8,8 +8,9 @@ from shapely.geometry import MultiLineString
 from shapely.geometry import MultiPolygon
 from shapely.geometry import Polygon
 from tqdm import tqdm
+from psycopg2.extras import execute_values
 from Loader.Loader.Entities.HexagonSize import HexagonSize
-from Loader.Loader.Entities.City import City   
+from Loader.Loader.Entities.City import City
 from Loader.Loader.Entities.SetElement import SetElement
 from Loader.Loader.Entities.EcologyHexagon import EcologyHexagon
 from Loader.Loader.Services.Utils import to_meters
@@ -25,19 +26,19 @@ def get_settlements_inside_polygon(
 ) -> List[SetElement]:
     settlements = []
     with connection.cursor() as cursor:
-        query = f"""
-            SELECT 
-                ST_AsText(ST_Transform(geometry, 4326)), 
+        query = """
+            SELECT
+                ST_AsText(ST_Transform(geometry, 4326)),
                 population,
                 type
             FROM public.osm_place_poly
             WHERE ST_Intersects(geometry,
                 ST_Transform(
-                    'SRID=4326;{polygon_wgs84.wkt}', 3857
+                    ST_GeomFromText(%s, 4326), 3857
                 )
-             )
+            )
         """
-        cursor.execute(query)
+        cursor.execute(query, (polygon_wgs84.wkt,))
         for (wkt_polygon, population, city_type) in cursor.fetchall():
             polygon = wkt.loads(wkt_polygon)
             _, polygon = to_meters(polygon, scale_factor=scale_factor)
@@ -73,21 +74,21 @@ def get_settlements_inside_polygon(
 def get_roads_inside_polygon(connection, polygon_wgs84: Polygon, scale_factor: float) -> List[Road]:
     roads = []
     with connection.cursor() as cursor:
-        query = f"""
+        query = """
             SELECT
                 ST_AsText(
                     ST_Intersection(
                         ST_Transform(geometry, 4326),
-                        'SRID=4326;{polygon_wgs84.wkt}'
+                        ST_GeomFromText(%s, 4326)
                     )
-                ) as road, 
+                ) as road,
                 type as road_type
-            FROM public.osm_roads_way 
+            FROM public.osm_roads_way
             WHERE
                 type not in ('service', 'track', 'raceway', 'runway')
-                and ST_Intersects(geometry, ST_Transform('SRID=4326;{polygon_wgs84.wkt}', 3857))
+                and ST_Intersects(geometry, ST_Transform(ST_GeomFromText(%s, 4326), 3857))
         """
-        cursor.execute(query)
+        cursor.execute(query, (polygon_wgs84.wkt, polygon_wgs84.wkt))
         for (wkt_linestring, road_type) in cursor.fetchall():
             line = wkt.loads(wkt_linestring)
             _, line = to_meters(line, scale_factor=scale_factor)
@@ -119,17 +120,17 @@ def get_ecology_pois_inside_polygon(
 ) -> List[EcologyPOI]:
     ecology_pois = []
     with connection.cursor() as cursor:
-        query = f"""
+        query = """
             SELECT
                 ST_AsText(ST_Transform(geometry_poly, 4326)),
                 impact
             FROM
                 public.ecology_poi
-            WHERE 
-                impact > 0 
-                and ST_Intersects(geometry_poly, ST_Transform('SRID=4326;{polygon_wgs84.wkt}', 3857))
+            WHERE
+                impact > 0
+                and ST_Intersects(geometry_poly, ST_Transform(ST_GeomFromText(%s, 4326), 3857))
         """
-        cursor.execute(query)
+        cursor.execute(query, (polygon_wgs84.wkt,))
         for (wkt_polygon, impact) in cursor.fetchall():
             polygon = wkt.loads(wkt_polygon)
             _, polygon = to_meters(polygon, scale_factor=scale_factor)
@@ -157,15 +158,15 @@ def get_ecology_pois_inside_polygon(
 def get_forests_inside_polygon(connection, polygon_wgs84: Polygon, scale_factor: float) -> List[Polygon]:
     forests = []
     with connection.cursor() as cursor:
-        query = f"""
+        query = """
             SELECT
-                ST_AsText(ST_Intersection(ST_Transform(geometry, 4326), 'SRID=4326;{polygon_wgs84.wkt}'))
-            FROM 
+                ST_AsText(ST_Intersection(ST_Transform(geometry, 4326), ST_GeomFromText(%s, 4326)))
+            FROM
                 public.osm_natural_poly
-            WHERE 
-                ST_Intersects(geometry, ST_Transform('SRID=4326;{polygon_wgs84.wkt}', 3857))
+            WHERE
+                ST_Intersects(geometry, ST_Transform(ST_GeomFromText(%s, 4326), 3857))
         """
-        cursor.execute(query)
+        cursor.execute(query, (polygon_wgs84.wkt, polygon_wgs84.wkt))
         for (wkt_polygon,) in cursor.fetchall():
             polygon = wkt.loads(wkt_polygon)
             _, polygon = to_meters(polygon, scale_factor=scale_factor)
@@ -200,20 +201,18 @@ def save_hexagons(connection, hexagons: List[EcologyHexagon]) -> None:
 
     with connection.cursor() as cursor:
         for hexagon_size, hexagons in hexagons_size_to_hexagons.items():
+            table = hexagons_size_to_table_name[hexagon_size]
             n_chunks = len(hexagons) // rows_per_chunk
             chunks = (hexagons[i:i + rows_per_chunk] for i in range(0, len(hexagons), rows_per_chunk))
             for chunk in tqdm(chunks, desc='Saving ecology hexagons', total=n_chunks):
                 data = [
-                    (
-                        hexagon.impact,
-                        f"SRID=3857;{hexagon.polygon_web_mercator.wkt}"
-                    )
+                    (hexagon.impact, f"SRID=3857;{hexagon.polygon_web_mercator.wkt}")
                     for hexagon in chunk
                 ]
-
-                args_str = ','.join(['%s'] * len(data))
-                sql = f"INSERT INTO public.{hexagons_size_to_table_name[hexagon_size]} " \
-                      "(impact, geometry) VALUES {}".format(args_str)
-                cursor.execute(cursor.mogrify(sql, data))
+                execute_values(
+                    cursor,
+                    f"INSERT INTO public.{table} (impact, geometry) VALUES %s",
+                    data
+                )
 
     connection.commit()

@@ -65,17 +65,16 @@ def create_hex_tables(conn):
               }
 
     for table, _ in tables.items():
-        commands = [f"DROP TABLE IF EXISTS {table}",
-                    f"CREATE TABLE {table} "
-                    f"(gid serial, impact int default 0, bld_dens_pct int, bld_human_density int, bld_pct int, infrastructure int, "
+        commands = [
+                    f"CREATE TABLE IF NOT EXISTS {table} "
+                    f"(gid serial PRIMARY KEY, impact int default 0, bld_dens_pct int, bld_human_density int, bld_pct int, infrastructure int, "
                     f"filter_subway smallint, filter_park smallint, filter_kindergarten smallint, "
                     f"filter_school smallint, filter_shop smallint, filter_where_to_eat smallint, "
                     f"life_quality smallint)",
-                    f"ALTER TABLE {table} ADD PRIMARY KEY (gid)",
-                    f"SELECT AddGeometryColumn('', '{table}', 'geometry', 3857, 'GEOMETRY', 2)"
+                    f"SELECT AddGeometryColumn('', '{table}', 'geometry', 3857, 'GEOMETRY', 2) "
+                    f"WHERE NOT EXISTS (SELECT 1 FROM geometry_columns WHERE f_table_name='{table}' AND f_geometry_column='geometry')",
+                    f"CREATE INDEX IF NOT EXISTS {table}_geom_idx ON {table} USING GIST(geometry)",
                     ]
-
-        commands.append(f"CREATE INDEX {table}_geom_idx ON {table} USING GIST(geometry)")
 
         cursor = conn.cursor()
 
@@ -97,12 +96,12 @@ def create_infrastructure_tables(conn):
     cursor = conn.cursor()
 
     table = "infrastructure_poi"
-    commands = [f"DROP TABLE IF EXISTS {table}",
-            f"CREATE TABLE {table} (gid serial, poi_type text, title text, "
+    commands = [
+            f"CREATE TABLE IF NOT EXISTS {table} (gid serial PRIMARY KEY, poi_type text, title text, "
             f"title_en text, title_ru text, importance int, min_level int)",
-            f"ALTER TABLE {table} ADD PRIMARY KEY (gid)",
-            f"SELECT AddGeometryColumn('', '{table}', 'geometry', 3857, 'GEOMETRY', 2)",
-            f"CREATE INDEX {table}_geom_idx ON {table} USING GIST(geometry)",
+            f"SELECT AddGeometryColumn('', '{table}', 'geometry', 3857, 'GEOMETRY', 2) "
+            f"WHERE NOT EXISTS (SELECT 1 FROM geometry_columns WHERE f_table_name='{table}' AND f_geometry_column='geometry')",
+            f"CREATE INDEX IF NOT EXISTS {table}_geom_idx ON {table} USING GIST(geometry)",
             ]
 
     for command in commands:
@@ -113,12 +112,12 @@ def create_human_density_tables(conn):
     cursor = conn.cursor()
 
     table = "human_density_poi"
-    commands = [f"DROP TABLE IF EXISTS {table}",
-            f"CREATE TABLE {table} (gid serial, poi numeric, title text, "
+    commands = [
+            f"CREATE TABLE IF NOT EXISTS {table} (gid serial PRIMARY KEY, poi numeric, title text, "
             f"title_en text, title_ru text)",
-            f"ALTER TABLE {table} ADD PRIMARY KEY (gid)",
-            f"SELECT AddGeometryColumn('', '{table}', 'geometry', 3857, 'GEOMETRY', 2)",
-            f"CREATE INDEX {table}_geom_idx ON {table} USING GIST(geometry)",
+            f"SELECT AddGeometryColumn('', '{table}', 'geometry', 3857, 'GEOMETRY', 2) "
+            f"WHERE NOT EXISTS (SELECT 1 FROM geometry_columns WHERE f_table_name='{table}' AND f_geometry_column='geometry')",
+            f"CREATE INDEX IF NOT EXISTS {table}_geom_idx ON {table} USING GIST(geometry)",
             ]
 
     for command in commands:
@@ -150,12 +149,11 @@ def create_global_tables(conn):
     cursor = conn.cursor()
     for table in ["world_oceans", "world_oceans_detailed", "world_countries", "world_cities"]:
         commands = [
-            f"DROP TABLE IF EXISTS {table}",
-            f"CREATE TABLE {table} (gid serial, scalerank int4, type varchar(80),"
+            f"CREATE TABLE IF NOT EXISTS {table} (gid serial PRIMARY KEY, scalerank int4, type varchar(80),"
             f" name varchar(80), name_ru varchar(80), name_en varchar(80))",
-            f"ALTER TABLE {table} ADD PRIMARY KEY (gid)",
-            f"SELECT AddGeometryColumn('', '{table}', 'geometry', 3857, 'GEOMETRY', 2)",
-            f"CREATE INDEX {table}_geom_idx ON {table} USING GIST(geometry)",
+            f"SELECT AddGeometryColumn('', '{table}', 'geometry', 3857, 'GEOMETRY', 2) "
+            f"WHERE NOT EXISTS (SELECT 1 FROM geometry_columns WHERE f_table_name='{table}' AND f_geometry_column='geometry')",
+            f"CREATE INDEX IF NOT EXISTS {table}_geom_idx ON {table} USING GIST(geometry)",
         ]
 
         for command in commands:
@@ -201,8 +199,8 @@ def create_tables(database_url: str):
 
 if __name__ == "__main__":
     wait_for_file("/data/finished_osm_import.txt")
-    database_url = "postgres://postgres:postgres_password@localhost:65432/maps_to_database"
+    database_url = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/maps_to_database")
     create_tables(database_url)
 
     with open('/data/finished_tables_preparation.txt', 'w') as f:
-        f.write(f"Done work.")
+        f.write("Done work.")
