@@ -1,6 +1,6 @@
-import mapboxgl from 'mapbox-gl'
+import maplibregl from 'maplibre-gl'
 
-export function buildMapStyle(maptilerKey: string): mapboxgl.Style {
+export function buildMapStyle(): maplibregl.StyleSpecification {
   return {
     version: 8,
     name: 'UrbanPulse',
@@ -9,7 +9,7 @@ export function buildMapStyle(maptilerKey: string): mapboxgl.Style {
     sources: {
       maptiler: {
         type: 'vector',
-        url: `https://api.maptiler.com/tiles/v3/tiles.json?key=${maptilerKey}`,
+        url: 'https://tiles.openfreemap.org/planet',
       },
       analytics: {
         type: 'vector',
@@ -18,8 +18,8 @@ export function buildMapStyle(maptilerKey: string): mapboxgl.Style {
         maxzoom: 15,
       },
     },
-    sprite: `https://api.maptiler.com/maps/basic-v2/sprite?key=${maptilerKey}`,
-    glyphs: `https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=${maptilerKey}`,
+    sprite: 'https://tiles.openfreemap.org/styles/liberty/sprite',
+    glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
     light: {
       anchor: 'viewport',
       color: '#fcfeff',
@@ -459,5 +459,5 @@ export function buildMapStyle(maptilerKey: string): mapboxgl.Style {
         },
       },
     ],
-  } as unknown as mapboxgl.Style
+  }
 }

@@ -1,7 +1,7 @@
 import { useClickAway } from 'ahooks'
 import block from 'bem-css-modules'
 import cn from 'classnames'
-import mapboxgl from 'mapbox-gl'
+import maplibregl from 'maplibre-gl'
 import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import {
@@ -44,7 +44,7 @@ export function MapMain({ className }: Props): JSX.Element {
     setShowContextMenu(false)
   }, [dragging])
 
-  const handleRightClick = (e: mapboxgl.MapMouseEvent) => {
+  const handleRightClick = (e: maplibregl.MapMouseEvent) => {
     const lng = Number(e.lngLat.lng.toFixed(6))
     const lat = Number(e.lngLat.lat.toFixed(6))
 
@@ -60,7 +60,7 @@ export function MapMain({ className }: Props): JSX.Element {
 
   return (
     <MapKeeper
-      style={buildMapStyle(process.env.NEXT_PUBLIC_MAPTILER_KEY ?? '')}
+      style={buildMapStyle()}
       className={classes}
       onRightClick={handleRightClick}
     >

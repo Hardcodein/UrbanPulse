@@ -1,4 +1,4 @@
-import 'mapbox-gl/dist/mapbox-gl.css'
+import 'maplibre-gl/dist/maplibre-gl.css'
 import appWithI18n from 'next-translate/appWithI18n'
 import type { AppProps } from 'next/app'
 import { useRouter } from 'next/router'

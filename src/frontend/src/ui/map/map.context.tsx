@@ -1,12 +1,12 @@
-import mapboxgl from 'mapbox-gl'
+import maplibregl from 'maplibre-gl'
 import { createContext, ReactNode } from 'react'
 
 type ProviderProps = {
-  map: mapboxgl.Map | null
+  map: maplibregl.Map | null
   children: ReactNode
 }
 
-type ContextProps = mapboxgl.Map | null
+type ContextProps = maplibregl.Map | null
 
 export const MapContext = createContext<ContextProps>(null)
 

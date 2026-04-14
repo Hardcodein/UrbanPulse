@@ -1,5 +1,5 @@
 import _isEqual from 'lodash/isEqual'
-import mapboxgl from 'mapbox-gl'
+import maplibregl from 'maplibre-gl'
 import { useRouter } from 'next/router'
 import { ReactNode, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -11,7 +11,7 @@ type Props = {
   className?: string
   preserveDrawingBuffer?: boolean
   disableUrlUpdate?: boolean
-  style?: mapboxgl.Style
+  style?: maplibregl.Style
   children?: ReactNode
 } & PropsEvents
 
@@ -73,11 +73,11 @@ export function MapKeeper({
     onMoveEnd && onMoveEnd(viewport)
   }
 
-  const handleClick = (e: mapboxgl.MapMouseEvent) => {
+  const handleClick = (e: maplibregl.MapMouseEvent) => {
     onClick && onClick(e)
   }
 
-  const handleRightClick = (e: mapboxgl.MapMouseEvent) => {
+  const handleRightClick = (e: maplibregl.MapMouseEvent) => {
     onRightClick && onRightClick(e)
   }
 
@@ -93,7 +93,6 @@ export function MapKeeper({
       lat={lat}
       zoom={zoom}
       style={style}
-      accessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ''}
       preserveDrawingBuffer={preserveDrawingBuffer}
       onClick={handleClick}
       onLoad={handleOnLoad}

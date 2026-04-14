@@ -1,6 +1,6 @@
 import block from 'bem-css-modules'
 import cn from 'classnames'
-import mapboxgl from 'mapbox-gl'
+import maplibregl from 'maplibre-gl'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { IconHub, iconHubColor, iconHubList, IconHubTypes } from '@ui/icon-hub'
 import { MapProvider } from '@ui/map/map.context'
@@ -21,25 +21,21 @@ export type PropsEvents = {
   onStyleDataLoading?: () => void
   onStyleData?: () => void
   onLoad?: () => void
-  onClick?: (e: mapboxgl.MapMouseEvent) => void
-  onRightClick?: (e: mapboxgl.MapMouseEvent) => void
+  onClick?: (e: maplibregl.MapMouseEvent) => void
+  onRightClick?: (e: maplibregl.MapMouseEvent) => void
 }
 
 type Props = {
-  baseApiUrl?: string
-  accessToken?: string
   lng: number
   lat: number
   zoom: number
-  style?: mapboxgl.Style
+  style?: maplibregl.Style
   className?: string
   children?: ReactNode
   preserveDrawingBuffer?: boolean
 } & PropsEvents
 
 export function Map({
-  baseApiUrl,
-  accessToken,
   lng,
   lat,
   zoom,
@@ -55,7 +51,7 @@ export function Map({
   onClick,
   onRightClick,
 }: Props): JSX.Element {
-  const map = useRef<mapboxgl.Map | null>(null)
+  const map = useRef<maplibregl.Map | null>(null)
   const mapContainer = useRef<HTMLDivElement>(null)
   const [isStyleLoading, setStyleLoading] = useState(true)
   const [calledFromMoveEnd, setCalledFromMoveEnd] = useState(false)
@@ -64,14 +60,11 @@ export function Map({
   useEffect(() => {
     if (!mapContainer.current) return
 
-    if (baseApiUrl) mapboxgl.baseApiUrl = baseApiUrl
-    if (accessToken) mapboxgl.accessToken = accessToken
-
-    map.current = new mapboxgl.Map({
+    map.current = new maplibregl.Map({
       container: mapContainer.current,
       zoom: zoom,
       center: [lng, lat],
-      style: style as mapboxgl.Style,
+      style: style as maplibregl.Style,
       hash: false,
       attributionControl: true,
       renderWorldCopies: false,
@@ -161,12 +154,12 @@ export function Map({
     onLoad && onLoad()
   }
 
-  const mapOnClickListener = (e: mapboxgl.MapMouseEvent) => {
+  const mapOnClickListener = (e: maplibregl.MapMouseEvent) => {
     if (e.lngLat.lng >= 180 || e.lngLat.lng <= -180) return
     onClick && onClick(e)
   }
 
-  const mapOnContextMenuListener = (e: mapboxgl.MapMouseEvent) => {
+  const mapOnContextMenuListener = (e: maplibregl.MapMouseEvent) => {
     if (e.lngLat.lng >= 180 || e.lngLat.lng <= -180) return
     onRightClick && onRightClick(e)
   }

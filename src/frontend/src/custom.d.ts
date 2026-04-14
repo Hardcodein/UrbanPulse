@@ -1,3 +1,5 @@
+import type maplibregl from 'maplibre-gl'
+
 interface Window {
-  __MAP: mapboxgl.Map | null
+  __MAP: maplibregl.Map | null
 }
