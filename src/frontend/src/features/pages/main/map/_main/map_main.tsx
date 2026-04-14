@@ -13,7 +13,7 @@ import { MapContextMenu, MapControlPositions, MapControls, MapKeeper } from '@ui
 import { MapControlDirections } from '@ui/map/__controls/map__controls.const'
 import { RootState } from '@redux/reducers'
 import style from './map_main.module.sass'
-import mapStyle from './map_main.style.json'
+import { buildMapStyle } from './map_main.style'
 
 const b = block(style)
 
@@ -60,7 +60,7 @@ export function MapMain({ className }: Props): JSX.Element {
 
   return (
     <MapKeeper
-      style={mapStyle as mapboxgl.Style}
+      style={buildMapStyle(process.env.NEXT_PUBLIC_MAPTILER_KEY ?? '')}
       className={classes}
       onRightClick={handleRightClick}
     >
